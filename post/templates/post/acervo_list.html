@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Acervo Digital - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-dark text-white py-16 text-center relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+    <div class="container mx-auto px-4 relative z-10">
+        <h1 class="font-serif italic text-4xl md:text-5xl mb-4">Acervo & Memória</h1>
+        <p class="text-cultura-sand text-lg max-w-2xl mx-auto font-light">
+            Um resgate da história de Tacima através de fotos, vídeos e relatos emocionantes.
+        </p>
+    </div>
+</section>
+
+<section class="py-12 bg-cultura-sand min-h-screen">
+    <div class="container mx-auto px-4">
+
+        <!-- Filtros (Poderiam ser implementados via JS ou Links GET) -->
+        <div class="flex justify-center flex-wrap gap-4 mb-10">
+            <a href="?type=all"
+                class="px-6 py-2 rounded-full border border-cultura-terracotta text-cultura-dark hover:bg-cultura-terracotta hover:text-white transition font-bold text-sm uppercase">Todos</a>
+            <a href="?type=foto"
+                class="px-6 py-2 rounded-full border border-cultura-terracotta text-cultura-dark hover:bg-cultura-terracotta hover:text-white transition font-bold text-sm uppercase">Fotos
+                Antigas</a>
+            <a href="?type=relato"
+                class="px-6 py-2 rounded-full border border-cultura-terracotta text-cultura-dark hover:bg-cultura-terracotta hover:text-white transition font-bold text-sm uppercase">Relatos</a>
+        </div>
+
+        {% if posts %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-max"
+            id="masonry-grid">
+            {% for post in posts %}
+            <div
+                class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 group break-inside-avoid mb-6">
+                <a href="{% url 'post:post_detail' post.id %}">
+                    <div class="relative">
+                        {% if post.thumbnail %}
+                        <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}"
+                            class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-500">
+                        {% else %}
+                        <div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-image fa-2x"></i>
+                        </div>
+                        {% endif %}
+
+                        <!-- Badge de Categoria -->
+                        <div class="absolute top-2 right-2">
+                            <span
+                                class="bg-cultura-terracotta text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+                                {{ post.get_category_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-5">
+                        <h3
+                            class="font-serif font-bold text-lg text-cultura-dark mb-2 leading-tight group-hover:text-cultura-terracotta transition">
+                            {{ post.title }}
+                        </h3>
+                        <p class="text-gray-500 text-xs mb-3 flex items-center gap-2">
+                            <i class="fa-regular fa-clock"></i> {{ post.created_at|date:"d M Y" }}
+                        </p>
+                        <p class="text-gray-600 text-sm line-clamp-3 font-light">
+                            {{ post.content|striptags|safe }}
+                        </p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginação -->
+        {% if posts.has_other_pages %}
+        <div class="flex justify-center mt-12 space-x-2">
+            {% if posts.has_previous %}
+            <a href="?page={{ posts.previous_page_number }}"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-300 hover:bg-cultura-terracotta hover:text-white transition"><i
+                    class="fa-solid fa-chevron-left"></i></a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-gray-600 font-bold">Página {{ posts.number }} de {{ posts.paginator.num_pages
+                }}</span>
+
+            {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-300 hover:bg-cultura-terracotta hover:text-white transition"><i
+                    class="fa-solid fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-20">
+            <i class="fa-regular fa-folder-open fa-4x text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-500">Nenhum registro encontrado no acervo.</h3>
+            <p class="text-gray-400">Seja o primeiro a contribuir com a memória de Tacima!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

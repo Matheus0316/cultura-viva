@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if grupo %}Criar Publicação em {{ grupo.name }}{% else %}Nova Publicação{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="bg-brand-cream py-16 md:py-24">
+    <div class="container mx-auto px-6 flex justify-center">
+
+        <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-8 md:p-12">
+                <div class="text-center mb-8">
+                    <h1 class="font-serif text-3xl md:text-4xl font-bold text-brand-brown">
+                        {% if grupo %}
+                            Criar Publicação em "{{ grupo.name }}"
+                        {% else %}
+                            Nova Publicação
+                        {% endif %}
+                    </h1>
+                    <p class="text-gray-600 mt-3">
+                        Compartilhe suas ideias e novidades com o público.
+                    </p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" 
+                      action="{% if grupo %}{% url 'post:post_create' grupo.id %}{% endif %}" 
+                      class="space-y-6">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-bold text-brand-brown mb-2">
+                            {{ form.title.label }}
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.title.errors %}<p>{{ error }}</p>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.thumbnail.id_for_label }}" class="block text-sm font-bold text-brand-brown mb-2">
+                           {{ form.thumbnail.label }}
+                        </label>
+                        {{ form.thumbnail }}
+                        {% if form.thumbnail.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.thumbnail.errors %}<p>{{ error }}</p>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.content.id_for_label }}" class="block text-sm font-bold text-brand-brown mb-2">
+                            {{ form.content.label }}
+                        </label>
+                        {{ form.content }}
+                         {% if form.content.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {% for error in form.content.errors %}<p>{{ error }}</p>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center">
+                        {{ form.comments_enabled }}
+                        <label for="{{ form.comments_enabled.id_for_label }}" class="ml-2 block text-sm text-gray-900">
+                           {{ form.comments_enabled.label }}
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-4 pt-4">
+                        {% if grupo %}
+                        <a href="{% url 'grupos:grupo_detail' grupo.id %}" class="text-gray-600 font-semibold hover:text-brand-brown transition duration-300">
+                            Cancelar
+                        </a>
+                        {% else %}
+                        <button type="button" onclick="history.back()" class="text-gray-600 font-semibold hover:text-brand-brown transition duration-300">
+                            Cancelar
+                        </button>
+                        {% endif %}
+                        <button type="submit"
+                                class="bg-brand-gold hover:bg-yellow-500 text-brand-brown font-bold py-3 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105">
+                            Publicar
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+    {{ block.super }} {# Mantém scripts do template pai (base.html), se houver #}
+
+    {{ form.media }}
+{% endblock %}

@@ -1,0 +1,158 @@
+<div class="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-gray-50">
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr class="bg-cultura-sand-light/50 border-b border-gray-50">
+                    <th class="px-10 py-8 text-left text-[9px] font-display font-black text-gray-400 uppercase tracking-[0.3em]">Guardião</th>
+                    <th class="px-10 py-8 text-left text-[9px] font-display font-black text-gray-400 uppercase tracking-[0.3em]">Contato Espacial</th>
+                    <th class="px-10 py-8 text-left text-[9px] font-display font-black text-gray-400 uppercase tracking-[0.3em]">Papéis na Rede</th>
+                    <th class="px-10 py-8 text-center text-[9px] font-display font-black text-gray-400 uppercase tracking-[0.3em]">Ações de Curadoria</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for user_obj in users %}
+                <tr class="group hover:bg-cultura-sand-light/20 transition-colors duration-500">
+                    <td class="px-10 py-8">
+                        <div class="flex items-center gap-6">
+                            <div class="relative">
+                                {% if user_obj.perfil.avatar %}
+                                <img class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm group-hover:scale-105 transition-transform" src="{{ user_obj.perfil.avatar }}" alt="" />
+                                {% else %}
+                                <div class="w-14 h-14 rounded-full bg-cultura-sand flex items-center justify-center text-cultura-dark/20 font-display font-black text-sm uppercase tracking-tighter border-2 border-white shadow-sm">
+                                    {{ user_obj.username|slice:":2"|upper }}
+                                </div>
+                                {% endif %}
+                                {% if user_obj.is_superuser %}
+                                <div class="absolute -right-1 -top-1 w-5 h-5 bg-cultura-green text-white rounded-full flex items-center justify-center text-[10px] shadow-lg border-2 border-white">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-cultura-dark font-serif italic text-lg truncate max-w-[200px]">
+                                    {{ user_obj.get_full_name|default:user_obj.username }}
+                                </p>
+                                <p class="text-[9px] font-display font-black text-gray-300 uppercase tracking-widest mt-1">@{{ user_obj.username }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-10 py-8">
+                        <p class="text-gray-400 text-sm font-light">{{ user_obj.email }}</p>
+                    </td>
+                    <td class="px-10 py-8">
+                        <div class="flex flex-wrap gap-2">
+                            {% if user_obj.is_superuser %}
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-cultura-dark text-white text-[8px] font-display font-black uppercase tracking-widest border border-white/10 shadow-sm">
+                                Admin
+                            </span>
+                            {% endif %}
+                            
+                            {% if user_obj.is_staff %}
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-cultura-sand-light text-cultura-dark text-[8px] font-display font-black uppercase tracking-widest border border-gray-100">
+                                Staff
+                            </span>
+                            {% endif %}
+                            
+                            {% if user_obj.artista_profile %}
+                                {% if user_obj.artista_profile.status == 'APPROVED' %}
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-cultura-green/10 text-cultura-green text-[8px] font-display font-black uppercase tracking-widest border border-cultura-green/20">
+                                    Artista
+                                </span>
+                                {% elif user_obj.artista_profile.status == 'PENDING' %}
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-yellow-50 text-yellow-600 text-[8px] font-display font-black uppercase tracking-widest border border-yellow-100">
+                                    Pendente
+                                </span>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if user_obj.perfil.can_add_acervo %}
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[8px] font-display font-black uppercase tracking-widest border border-blue-100">
+                                Curador
+                            </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-10 py-8">
+                        <div class="flex items-center justify-center gap-3">
+                            <!-- Toggle Admin -->
+                            <form method="post" action="{% url 'perfil:promote_superuser' user_obj.id %}" onsubmit="return confirm('Alterar status administrativo deste guardião?');">
+                                {% csrf_token %}
+                                {% if user_obj.is_superuser %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm" title="Remover Administrativo">
+                                    <i class="fa-solid fa-user-gear"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-gray-300 hover:bg-cultura-dark hover:text-white transition-all shadow-sm border border-gray-50" title="Elevar a Administrativo">
+                                    <i class="fa-solid fa-user-gear"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+
+                            <!-- Artist Management -->
+                            {% if not user_obj.artista_profile %}
+                            <form method="post" action="{% url 'perfil:create_artist_from_admin' user_obj.id %}" onsubmit="return confirm('Iniciar perfil artístico para este guardião?');">
+                                {% csrf_token %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-gray-300 hover:bg-cultura-green hover:text-white transition-all shadow-sm border border-gray-50" title="Tornar Artista">
+                                    <i class="fa-solid fa-palette"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'perfil:remove_artist_from_admin' user_obj.id %}" onsubmit="return confirm('Dissolver perfil artístico? Esta ação é irreversível.');">
+                                {% csrf_token %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Remover Artista">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Acervo Permission -->
+                            <form method="post" action="{% url 'perfil:toggle_acervo_permission' user_obj.id %}" onsubmit="return confirm('Alterar permissões de curadoria do acervo?');">
+                                {% csrf_token %}
+                                {% if user_obj.perfil.can_add_acervo %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-50 text-blue-500 hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Cessar Curadoria">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-gray-300 hover:bg-blue-500 hover:text-white transition-all shadow-sm border border-gray-50" title="Delegar Curadoria">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+
+                            <a href="{% url 'perfil:profile_detail' user_obj.perfil.id %}" class="w-10 h-10 rounded-full flex items-center justify-center bg-white text-gray-300 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all shadow-sm border border-gray-50" title="Observar Perfil">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-10 py-32 text-center">
+                        <div class="w-20 h-20 bg-cultura-sand rounded-full flex items-center justify-center mx-auto mb-8 text-gray-200 text-3xl">
+                            <i class="fa-solid fa-users-slash"></i>
+                        </div>
+                        <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Rede Silenciosa</h3>
+                        <p class="text-gray-400 font-light max-w-sm mx-auto">Nenhum guardião encontrado sob estes critérios de busca.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação e Métricas -->
+    <div class="px-10 py-8 bg-cultura-sand-light/20 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-gray-50">
+        <div class="flex items-center gap-4">
+            <span class="w-2 h-2 rounded-full bg-cultura-green animate-pulse"></span>
+            <span class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest">
+                {{ users.count }} Guardiões Indexados
+            </span>
+        </div>
+        
+        {% if users.has_other_pages %}
+        <nav class="flex items-center gap-2">
+            <!-- Paginação compacta pode ser adicionada aqui se necessário pela view -->
+        </nav>
+        {% endif %}
+    </div>
+</div>

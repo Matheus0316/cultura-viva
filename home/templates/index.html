@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cultura Viva Tacima - Início{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section Premium -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- Sophisticated Background -->
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1533105070520-1e882a54360e?q=80&w=2070&auto=format&fit=crop"
+            alt="Cultura Nordestina" class="w-full h-full object-cover scale-110 animate-[zoom-slow_20s_infinite_alternate]">
+        <div class="absolute inset-0 bg-gradient-to-tr from-cultura-dark via-cultura-dark/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-black/30"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-6 text-center lg:text-left">
+        <div class="max-w-4xl mx-auto lg:mx-0">
+            <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-8 animate-fade-in-up">
+                <span class="w-2 h-2 bg-cultura-terracotta rounded-full animate-pulse"></span>
+                <span class="text-white font-display font-bold text-[10px] tracking-[0.3em] uppercase">Tacima - Paraíba</span>
+            </div>
+            
+            <h1 class="font-serif italic text-6xl md:text-8xl lg:text-9xl text-white mb-6 leading-tight animate-fade-in-up [animation-delay:200ms]">
+                Terra de <span class="text-cultura-terracotta not-italic font-display font-black block lg:inline text-shadow-lg">Memória</span>
+            </h1>
+            
+            <p class="text-white/80 text-lg md:text-xl font-light max-w-2xl mb-12 animate-fade-in-up [animation-delay:400ms] leading-relaxed">
+                Um santuário contemporâneo dedicado à salvaguarda da alma tacimense. Onde o passado respira e a arte local encontra seu futuro.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start animate-fade-in-up [animation-delay:600ms]">
+                <a href="{% url 'events:event_list' %}"
+                    class="group relative overflow-hidden bg-cultura-terracotta text-white font-display font-extrabold py-5 px-10 rounded-full shadow-premium hover:shadow-premium-hover transition-all duration-500 hover:-translate-y-1">
+                    <span class="relative z-10 flex items-center gap-2">
+                        EXPLORAR AGENDA <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i>
+                    </span>
+                    <div class="absolute inset-0 bg-cultura-dark translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                </a>
+                <a href="{% url 'grupos:grupo_list' %}"
+                    class="group bg-white/5 backdrop-blur-sm border border-white/30 text-white font-display font-extrabold py-5 px-10 rounded-full hover:bg-white hover:text-cultura-dark transition-all duration-500 shadow-xl">
+                    PROJETOS SOCIAIS
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 hidden md:block">
+        <div class="w-px h-16 bg-gradient-to-b from-transparent via-white to-transparent"></div>
+    </div>
+</section>
+
+<!-- Visual Mosaic Navigation -->
+<section class="relative z-20 -mt-32 pb-32">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <a href="{% url 'grupos:grupo_list' %}" class="group relative aspect-[4/5] md:aspect-square rounded-[2rem] overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2670&auto=format&fit=crop"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Projetos Sociais">
+                <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark via-cultura-dark/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-10 w-full">
+                    <span class="text-cultura-yellow-light text-[10px] font-display font-black uppercase tracking-[0.3em] mb-4 block">Conectar</span>
+                    <h3 class="text-3xl font-serif italic text-white mb-2">Projetos Sociais</h3>
+                    <p class="text-white/60 text-sm font-light leading-relaxed max-h-0 group-hover:max-h-20 opacity-0 group-hover:opacity-100 transition-all duration-500">Transformação comunitária através da educação e arte.</p>
+                </div>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="{% url 'artistas:artista_list' %}" class="group relative aspect-[4/5] md:aspect-square rounded-[2rem] overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-700 md:translate-y-12">
+                <img src="https://images.unsplash.com/photo-1510915998375-9e66fd93503f?q=80&w=2574&auto=format&fit=crop"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Artistas">
+                <div class="absolute inset-0 bg-gradient-to-t from-cultura-terracotta/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute bottom-0 left-0 p-10 w-full">
+                    <span class="text-white text-[10px] font-display font-black uppercase tracking-[0.3em] mb-4 block">Inspirar</span>
+                    <h3 class="text-3xl font-serif italic text-white mb-2">Talentos Locais</h3>
+                    <p class="text-white/80 text-sm font-light leading-relaxed max-h-0 group-hover:max-h-20 opacity-0 group-hover:opacity-100 transition-all duration-500">A voz e o movimento genuíno da nossa gente.</p>
+                </div>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="{% url 'acervo:acervo_list' %}" class="group relative aspect-[4/5] md:aspect-square rounded-[2rem] overflow-hidden shadow-premium hover:shadow-premium-hover transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=2574&auto=format&fit=crop"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Relatos">
+                <div class="absolute inset-0 bg-gradient-to-t from-cultura-green/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute bottom-0 left-0 p-10 w-full">
+                    <span class="text-white text-[10px] font-display font-black uppercase tracking-[0.3em] mb-4 block">Salvaguardar</span>
+                    <h3 class="text-3xl font-serif italic text-white mb-2">Acervo & Memória</h3>
+                    <p class="text-white/80 text-sm font-light leading-relaxed max-h-0 group-hover:max-h-20 opacity-0 group-hover:opacity-100 transition-all duration-500">Documentos e fragmentos que compõem nossa história.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Universal Recommendation Engine -->
+<section class="py-24 bg-white relative overflow-hidden">
+    <!-- Abstract Decorative Elements -->
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-cultura-sand-light skew-x-12 translate-x-1/2 opacity-30"></div>
+    
+    <div class="container mx-auto px-6 relative z-10">
+        
+        <!-- Artists Recommendation Track -->
+        <div class="mb-32">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8" data-aos="fade-up">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-3 mb-4">
+                        <span class="h-[2px] w-12 bg-cultura-terracotta"></span>
+                        <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Curadoria de Talentos</span>
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-serif italic text-cultura-dark leading-tight">
+                        Artistas que <br> <span class="not-italic font-display font-black text-cultura-terracotta/20">você precisa conhecer</span>
+                    </h2>
+                </div>
+                <a href="{% url 'artistas:artista_list' %}" class="group flex items-center gap-4 text-cultura-dark font-display font-bold text-xs uppercase tracking-widest hover:text-cultura-terracotta transition-colors">
+                    Explorar todos os talentos <span class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-cultura-terracotta transition-colors"><i class="fa-solid fa-arrow-right"></i></span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                {% for artista in artistas_recomendados %}
+                <div class="group relative bg-white rounded-[3rem] p-8 border border-gray-100 shadow-premium hover:shadow-premium-hover transition-all duration-500 hover:-translate-y-2" data-aos="fade-up">
+                    <div class="relative w-40 h-40 mx-auto mb-8">
+                        <div class="absolute inset-0 bg-cultura-terracotta/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-700"></div>
+                        <img src="{{ artista.photo_url }}" class="relative z-10 w-full h-full object-cover rounded-full border-4 border-white shadow-xl" alt="{{ artista.name }}">
+                        <div class="absolute bottom-2 right-2 z-20 bg-cultura-terracotta text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform">
+                            <i class="fa-solid fa-star text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-cultura-dark font-serif italic text-2xl mb-2">{{ artista.name }}</h4>
+                        <span class="inline-block py-1 px-4 bg-cultura-sand-light rounded-full text-cultura-terracotta text-[9px] font-display font-black uppercase tracking-widest mb-8">{{ artista.get_category_display }}</span>
+                        
+                        <div class="flex items-center justify-center gap-4 pt-6 border-t border-gray-50">
+                            <a href="{% url 'artistas:artista_detail' artista.id %}" class="w-full py-4 rounded-2xl bg-cultura-dark text-white text-[10px] font-display font-bold uppercase tracking-widest hover:bg-cultura-terracotta transition-all shadow-lg active:scale-95">Ver Biografia</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full py-20 text-center glass rounded-[3rem] border-dashed border-2 border-gray-100">
+                    <p class="text-gray-400 font-display font-bold uppercase tracking-widest text-xs">Nenhum artista em destaque no momento.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Groups Recommendation Track -->
+        <div>
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8" data-aos="fade-up">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-3 mb-4">
+                        <span class="h-[2px] w-12 bg-cultura-green"></span>
+                        <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Ecos da Comunidade</span>
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-serif italic text-cultura-dark leading-tight">
+                        Projetos Sociais <br> <span class="not-italic font-display font-black text-cultura-green/20">em Movimento</span>
+                    </h2>
+                </div>
+                <a href="{% url 'grupos:grupo_list' %}" class="group flex items-center gap-4 text-cultura-dark font-display font-bold text-xs uppercase tracking-widest hover:text-cultura-green transition-colors">
+                    Ver todos os coletivos <span class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-cultura-green transition-colors"><i class="fa-solid fa-arrow-right"></i></span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                {% for grupo in grupos_recomendados %}
+                <article class="group bg-cultura-sand-light rounded-[3rem] overflow-hidden border border-gray-100 hover:border-cultura-green/20 transition-all duration-700 flex flex-col hover:shadow-premium shadow-sm" data-aos="fade-up">
+                    <div class="aspect-[16/10] relative overflow-hidden">
+                        <img src="{{ grupo.thumbnail_url }}" alt="{{ grupo.name }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark/40 to-transparent"></div>
+                        <div class="absolute top-6 left-6">
+                            <span class="bg-white/90 backdrop-blur-md text-cultura-dark text-[9px] font-display font-black px-5 py-2.5 rounded-full uppercase tracking-widest shadow-lg">
+                                {{ grupo.get_category_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-10 flex-grow flex flex-col">
+                        <h3 class="font-serif italic text-3xl text-cultura-dark mb-4 group-hover:text-cultura-green transition-colors duration-500">{{ grupo.name }}</h3>
+                        <p class="text-gray-500 font-light leading-relaxed mb-10 line-clamp-2 text-sm">
+                            {{ grupo.description }}
+                        </p>
+                        <div class="mt-auto pt-8 border-t border-gray-100 flex justify-between items-center">
+                            <a href="{% url 'grupos:grupo_detail' grupo.id %}" class="font-display font-black text-[10px] text-cultura-dark uppercase tracking-widest hover:text-cultura-green transition-all flex items-center gap-3 group/btn">
+                                Descobrir <span class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center group-hover/btn:bg-cultura-green group-hover/btn:text-white transition-all"><i class="fa-solid fa-chevron-right text-[8px]"></i></span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="col-span-full py-20 text-center glass rounded-[3rem] border-dashed border-2 border-gray-100">
+                    <p class="text-gray-400 font-display font-bold uppercase tracking-widest text-xs">Nenhum projeto social recomendado no momento.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Premium Call to Action -->
+<section class="py-32 bg-cultura-sand-light relative overflow-hidden">
+    <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+    
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="max-w-5xl mx-auto glass rounded-[4rem] p-12 md:p-24 text-center border-white">
+            <h2 class="font-serif italic text-5xl md:text-7xl text-cultura-dark mb-8 leading-tight">
+                Você faz parte desta <span class="text-cultura-terracotta not-italic font-display font-black">História.</span>
+            </h2>
+            <p class="text-cultura-dark/60 max-w-2xl mx-auto mb-16 text-lg md:text-xl font-light leading-relaxed">
+                Nossa memória é um mosaico vivo construído por cada cidadão. Contribua com o acervo, registre seu talento ou participe da nossa jornada.
+            </p>
+
+            {% if not user.is_authenticated %}
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="{% url 'home:register' %}"
+                    class="bg-cultura-dark text-white font-display font-extrabold py-6 px-12 rounded-full shadow-premium hover:shadow-premium-hover transition-all duration-500 uppercase tracking-widest text-sm hover:-translate-y-1">
+                    Cadastrar-se Agora
+                </a>
+                <a href="{% url 'home:login' %}"
+                    class="bg-white border-2 border-cultura-dark text-cultura-dark font-display font-extrabold py-6 px-12 rounded-full hover:bg-cultura-dark hover:text-white transition-all duration-500 uppercase tracking-widest text-sm">
+                    Entrar na Plataforma
+                </a>
+            </div>
+            {% else %}
+            <div class="flex justify-center">
+                <a href="mailto:cultura@tacima.pb.gov.br?subject=Contribuição para o Acervo Digital"
+                    class="group bg-cultura-green text-white font-display font-extrabold py-6 px-12 rounded-full shadow-premium hover:shadow-premium-hover transition-all duration-500 uppercase tracking-widest text-sm hover:-translate-y-1 flex items-center gap-3">
+                    <i class="fa-solid fa-paper-plane group-hover:-rotate-12 transition-transform"></i> Enviar Contribuição
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    @keyframes zoom-slow {
+        from { transform: scale(1); }
+        to { transform: scale(1.1); }
+    }
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        opacity: 0;
+    }
+    .text-shadow-lg {
+        text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+</style>
+
+{% endblock %}

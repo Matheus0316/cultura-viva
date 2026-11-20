@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agenda Cultural - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light pt-12 pb-24 min-h-screen">
+    <div class="container mx-auto px-6">
+
+        <div class="text-center mb-16" data-aos="fade-up">
+            <div class="inline-flex items-center gap-3 mb-4">
+                <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+                <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Experiências</span>
+                <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+            </div>
+            <h1 class="font-serif italic text-5xl md:text-6xl text-cultura-dark mb-4">
+                Agenda <span class="not-italic font-display font-black text-cultura-terracotta/20">Cultural</span>
+            </h1>
+            <p class="text-gray-500 font-light max-w-xl mx-auto">Explore eventos, oficinas e manifestações que dão vida à nossa Tacima.</p>
+        </div>
+
+        {% if user.is_staff or user.is_superuser %}
+        <div class="mb-12 flex justify-center md:justify-end">
+            <a href="{% url 'events:event_create' %}"
+                class="group flex items-center gap-3 px-8 py-4 bg-cultura-dark text-white font-display font-extrabold text-[11px] uppercase tracking-widest rounded-full hover:bg-cultura-terracotta transition-all duration-500 shadow-premium hover:shadow-premium-hover hover:-translate-y-1">
+                <i class="fa-solid fa-plus-circle text-lg group-hover:rotate-90 transition-transform"></i>
+                Adicionar Novo Evento
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Premium Filter Section -->
+        <div class="max-w-6xl mx-auto mb-16" data-aos="fade-up">
+            <form id="filter-form" method="GET" action="{% url 'events:event_list' %}"
+                class="bg-white rounded-[2.5rem] shadow-premium p-8 lg:p-10 border border-gray-100">
+                
+                <div class="flex flex-col lg:flex-row gap-8 items-center lg:items-end">
+                    <!-- Search Field -->
+                    <div class="w-full lg:flex-grow relative">
+                        <label class="block text-[10px] font-display font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-4">O que você procura?</label>
+                        <div class="relative">
+                            <input type="text" name="search" value="{{ search }}"
+                                class="w-full pl-14 pr-6 py-4 bg-cultura-sand-light border-none rounded-full focus:ring-2 focus:ring-cultura-terracotta/20 text-cultura-dark font-medium placeholder:text-gray-400 transition-all shadow-inner"
+                                placeholder="Buscar por festival, oficina, mostra...">
+                            <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-cultura-terracotta"></i>
+                        </div>
+                    </div>
+
+                    <!-- Filter Toggler for Mobile -->
+                    <div class="w-full lg:w-auto flex justify-end lg:hidden">
+                        <button type="button" onclick="document.getElementById('advanced-filters').classList.toggle('hidden')" 
+                            class="flex items-center gap-2 text-cultura-dark font-display font-bold text-[10px] uppercase tracking-widest">
+                            <i class="fa-solid fa-sliders"></i> Filtros Avançados
+                        </button>
+                    </div>
+
+                    <!-- Filter Groups -->
+                    <div id="advanced-filters" class="hidden lg:flex flex-wrap lg:flex-nowrap gap-x-8 gap-y-6 w-full lg:w-auto lg:mb-1">
+                        <!-- Period -->
+                        <div>
+                            <span class="block text-[9px] font-display font-black uppercase tracking-[0.1em] text-gray-400 mb-3">Período</span>
+                            <div class="flex items-center gap-4">
+                                <label class="group flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="filter" value="upcoming" class="hidden peer" {% if 'upcoming' in filter_options %}checked{% endif %}>
+                                    <div class="w-10 h-6 bg-gray-200 rounded-full peer-checked:bg-cultura-terracotta transition-colors relative">
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                    </div>
+                                    <span class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-600 peer-checked:text-cultura-terracotta transition-colors">Próximos</span>
+                                </label>
+                                <label class="group flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="filter" value="occurred" class="hidden peer" {% if 'occurred' in filter_options %}checked{% endif %}>
+                                    <div class="w-10 h-6 bg-gray-200 rounded-full peer-checked:bg-cultura-dark transition-colors relative">
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                    </div>
+                                    <span class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-600 peer-checked:text-cultura-dark transition-colors">Passados</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Type -->
+                        <div class="border-l border-gray-100 pl-8 hidden lg:block">
+                            <span class="block text-[9px] font-display font-black uppercase tracking-[0.1em] text-gray-400 mb-3">Origem</span>
+                            <div class="flex items-center gap-4">
+                                <label class="group flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="filter" value="artist_events" class="hidden peer" {% if 'artist_events' in filter_options %}checked{% endif %}>
+                                    <div class="w-5 h-5 border-2 border-gray-200 rounded-lg flex items-center justify-center peer-checked:border-cultura-green peer-checked:bg-cultura-green transition-all shadow-sm">
+                                        <i class="fa-solid fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                    </div>
+                                    <span class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-600">Artistas</span>
+                                </label>
+                                <label class="group flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="filter" value="city_events" class="hidden peer" {% if 'city_events' in filter_options %}checked{% endif %}>
+                                    <div class="w-5 h-5 border-2 border-gray-200 rounded-lg flex items-center justify-center peer-checked:border-cultura-green peer-checked:bg-cultura-green transition-all shadow-sm">
+                                        <i class="fa-solid fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                    </div>
+                                    <span class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-600">Prefeitura</span>
+                                </label>
+                                <label class="group flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="filter" value="group_events" class="hidden peer" {% if 'group_events' in filter_options %}checked{% endif %}>
+                                    <div class="w-5 h-5 border-2 border-gray-200 rounded-lg flex items-center justify-center peer-checked:border-cultura-green peer-checked:bg-cultura-green transition-all shadow-sm">
+                                        <i class="fa-solid fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                    </div>
+                                    <span class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-600">Grupos</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="event-list-container" class="transition-all duration-500">
+            {% include 'events/partials/event_list.html' %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    $(document).ready(function () {
+        function fetchEvents(url) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#event-list-container').addClass('opacity-50 blur-sm scale-[0.98]');
+                },
+                success: function (data) {
+                    $('#event-list-container').html(data.html).removeClass('opacity-50 blur-sm scale-[0.98]');
+                    if (url !== window.location.href) {
+                        window.history.pushState({ path: url }, '', url);
+                    }
+                },
+                error: function () {
+                    $('#event-list-container').removeClass('opacity-50 blur-sm scale-[0.98]');
+                }
+            });
+        }
+
+        let debounceTimer;
+        const form = $('#filter-form');
+        const actionUrl = form.attr('action');
+
+        form.find('input[name="search"]').on('keyup', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                const queryParams = form.serialize();
+                const url = actionUrl + '?' + queryParams;
+                fetchEvents(url);
+            }, 800);
+        });
+
+        form.find('input[type="checkbox"]').on('change', function () {
+            const queryParams = form.serialize();
+            const url = actionUrl + '?' + queryParams;
+            fetchEvents(url);
+        });
+
+        form.on('submit', function (e) {
+            e.preventDefault();
+            fetchEvents(actionUrl + '?' + $(this).serialize());
+        });
+
+        $(document).on('click', '#event-list-container .pagination-link', function (e) {
+            e.preventDefault();
+            fetchEvents($(this).attr('href'));
+        });
+
+        window.onpopstate = function () {
+            fetchEvents(location.href);
+        };
+    });
+</script>
+{% endblock %}

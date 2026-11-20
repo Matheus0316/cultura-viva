@@ -1,0 +1,95 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+    {% for profile in profiles %}
+    <article class="group bg-white rounded-[2.5rem] shadow-premium hover:shadow-premium-hover transition-all duration-700 overflow-hidden border border-gray-50">
+        <!-- Abstract Header Backdrop -->
+        <div class="h-24 bg-cultura-sand-light relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+            <div class="absolute -right-4 -top-4 w-20 h-20 bg-cultura-green/10 rounded-full blur-2xl group-hover:bg-cultura-green/20 transition-colors"></div>
+        </div>
+        
+        <div class="relative px-8">
+            <div class="relative inline-block -mt-12">
+                <img src="{{ profile.avatar }}" alt="{{ profile.user.username }}"
+                     class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-premium group-hover:scale-105 transition-transform duration-700">
+                <div class="absolute inset-0 rounded-full border border-cultura-green/20 group-hover:border-cultura-green/40 transition-colors"></div>
+            </div>
+        </div>
+
+        <div class="p-8 pt-6 flex flex-col min-h-[280px]">
+            <div class="mb-6">
+                <h2 class="font-serif italic text-2xl text-cultura-dark group-hover:text-cultura-green transition-colors duration-500 truncate">
+                    {{ profile.user.first_name }} {{ profile.user.last_name }}
+                </h2>
+                <p class="text-[9px] font-display font-black text-gray-300 uppercase tracking-widest">
+                    @{{ profile.user.username }}
+                </p>
+            </div>
+
+            <p class="text-gray-400 font-light text-sm leading-relaxed mb-8 flex-grow line-clamp-3">
+                {{ profile.bio|truncatewords:15|default:"Um entusiasta da cultura tacimense em busca de novas conexões e expressões." }}
+            </p>
+
+            <div class="space-y-3">
+                <a href="{% url 'perfil:profile_detail' profile.id %}" 
+                    class="block w-full py-4 text-center bg-cultura-dark text-white rounded-full text-[9px] font-display font-black uppercase tracking-[0.2em] hover:bg-cultura-green transition-all duration-500 shadow-xl">
+                    Explorar Perfil
+                </a>
+
+                {% if profile.membership %}
+                    <div class="flex gap-2">
+                        {% if profile.membership.position == 'Líder' %}
+                            <a href="{% url 'perfil:update_membership' profile.id %}" 
+                                class="flex-grow py-3 text-center bg-gray-50 text-gray-400 rounded-full text-[8px] font-display font-black uppercase tracking-widest hover:bg-gray-100 hover:text-gray-600 transition-all">
+                                <i class="fa-solid fa-turn-down mr-2 text-[10px]"></i> Rebaixar
+                            </a>
+                        {% else %}
+                            <a href="{% url 'perfil:update_membership' profile.id %}" 
+                                class="flex-grow py-3 text-center bg-cultura-green/5 text-cultura-green rounded-full text-[8px] font-display font-black uppercase tracking-widest hover:bg-cultura-green hover:text-white transition-all">
+                                <i class="fa-solid fa-crown mr-2 text-[10px]"></i> Promover
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'perfil:remove_member' profile.id %}" 
+                            class="px-4 py-3 text-center bg-red-50 text-red-400 rounded-full text-[8px] font-display font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="col-span-full py-32 text-center glass rounded-[4rem] border-2 border-dashed border-gray-200">
+        <div class="w-20 h-20 bg-cultura-sand rounded-full flex items-center justify-center mx-auto mb-8 text-gray-200 text-3xl">
+            <i class="fa-solid fa-user-slash"></i>
+        </div>
+        <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Vazio Social</h3>
+        <p class="text-gray-400 font-light max-w-sm mx-auto">Nenhum perfil encontrado com os parâmetros informados. A comunidade é vasta, tente novos termos.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if profiles.has_other_pages %}
+<div class="mt-24 flex justify-center">
+    <nav class="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-xl rounded-full shadow-premium border border-white">
+        {% if profiles.has_previous %}
+        <a href="?page={{ profiles.previous_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+            class="w-14 h-14 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-dark hover:text-white transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        <div class="px-8 py-3 bg-cultura-sand-light rounded-full border border-gray-100">
+            <span class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest">
+                Página {{ profiles.number }} de {{ profiles.paginator.num_pages }}
+            </span>
+        </div>
+
+        {% if profiles.has_next %}
+        <a href="?page={{ profiles.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+            class="w-14 h-14 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-dark hover:text-white transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}

@@ -1,0 +1,35 @@
+<div class="pt-6 border-t border-gray-50 space-y-3">
+    {% load l10n %}
+    <input type="hidden" name="shipping_cost" value="{{ shipping_cost|unlocalize }}">
+    <div class="flex justify-between items-center px-4">
+        <span class="text-[9px] font-display font-bold uppercase tracking-widest text-gray-400">Subtotal</span>
+        <span class="text-xs font-display font-black text-gray-500">R$ {{ subtotal|floatformat:2 }}</span>
+    </div>
+
+    {% if not pickup_on_site %}
+    <div class="flex justify-between items-center px-4">
+        <span class="text-[9px] font-display font-bold uppercase tracking-widest text-gray-400">Frete</span>
+        <span class="text-xs font-display font-black text-cultura-terracotta">
+            {% if shipping_cost > 0 %}
+            R$ {{ shipping_cost|floatformat:2 }}
+            {% else %}
+            Grátis
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+
+    {% if payment_fee > 0 %}
+    <div class="flex justify-between items-center px-4">
+        <span class="text-[9px] font-display font-bold uppercase tracking-widest text-gray-400">Taxas de
+            Processamento</span>
+        <span class="text-xs font-display font-black text-cultura-terracotta">R$ {{ payment_fee|floatformat:2 }}</span>
+    </div>
+    {% endif %}
+
+    <div class="flex justify-between items-center px-4 bg-cultura-sand-light/50 py-4 rounded-2xl">
+        <span class="text-[10px] font-display font-black uppercase tracking-widest text-cultura-dark">Total
+            Previsto</span>
+        <span class="font-display font-black text-lg text-cultura-dark">R$ {{ total_price|floatformat:2 }}</span>
+    </div>
+</div>

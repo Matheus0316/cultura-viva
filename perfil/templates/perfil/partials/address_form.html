@@ -1,0 +1,315 @@
+<!-- Premium Address Modal -->
+<div id="address-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-cultura-dark/60 backdrop-blur-md transition-all duration-500">
+    <!-- Modal Content -->
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl max-h-[95vh] overflow-hidden flex flex-col transform transition-all duration-700 scale-100 border border-white/20" data-aos="zoom-in">
+        
+        <!-- Modal Header -->
+        <div class="px-8 py-6 flex justify-between items-center border-b border-gray-100 bg-cultura-sand-light/10">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="w-4 h-[1px] bg-cultura-green"></span>
+                    <span class="text-[9px] font-display font-black text-cultura-green uppercase tracking-[0.3em]">Logística</span>
+                </div>
+                <h3 class="font-serif italic text-2xl text-cultura-dark">{% if address %}Editar Localização{% else %}Novo Endereço{% endif %}</h3>
+            </div>
+            <button onclick="document.getElementById('address-modal').classList.add('opacity-0', 'scale-95'); setTimeout(() => document.getElementById('address-modal').remove(), 300)" 
+                class="w-10 h-10 rounded-full flex items-center justify-center text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all duration-300">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body (Form) -->
+        <div class="p-8 overflow-y-auto custom-scrollbar">
+            <div class="mb-8 p-4 bg-cultura-green/5 rounded-2xl border border-cultura-green/10 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-cultura-green text-white flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-map-pin"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-display font-bold text-cultura-dark uppercase tracking-tight leading-none mb-1">Geolocalização Ativa</p>
+                        <p class="text-[9px] text-gray-400 font-medium">Use o GPS para preenchimento automático.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="getLocation()" class="px-5 py-2.5 bg-cultura-green text-white rounded-xl text-[9px] font-display font-black uppercase tracking-widest hover:bg-cultura-dark transition-all duration-300 shadow-sm flex items-center gap-2 group">
+                    <i class="fa-solid fa-location-crosshairs group-hover:rotate-90 transition-transform"></i>
+                    Usar minha localização
+                </button>
+            </div>
+
+            <form method="POST" 
+                  action="{% if address %}{% url 'perfil:address_edit' address.pk %}{% else %}{% url 'perfil:address_add' %}{% endif %}" 
+                  hx-post="{% if address %}{% url 'perfil:address_edit' address.pk %}{% else %}{% url 'perfil:address_add' %}{% endif %}"
+                  hx-target="#address-modal"
+                  hx-swap="outerHTML"
+                  class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="p-4 bg-red-50 border border-red-100 rounded-2xl mb-6">
+                        <p class="text-[10px] font-display font-black text-red-500 uppercase tracking-widest mb-2">Ops! Verifique os campos:</p>
+                        <ul class="list-disc list-inside text-[9px] text-red-400 font-medium">
+                            {% for field in form %}
+                                {% if field.name != 'latitude' and field.name != 'longitude' %}
+                                    {% if field.errors %}
+                                        <li>{{ field.label }}: {{ field.errors|join:", " }}</li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {{ form.latitude }}
+                {{ form.longitude }}
+                
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">CEP</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-barcode absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                            {{ form.zip_code }}
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">Número</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-hashtag absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                            {{ form.number }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">Logradouro / Rua</label>
+                    <div class="relative group">
+                        <i class="fa-solid fa-road absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                        {{ form.street }}
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">Bairro</label>
+                    <div class="relative group">
+                        <i class="fa-solid fa-draw-polygon absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                        {{ form.neighborhood }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">Cidade</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-city absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                            {{ form.city }}
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">Estado / UF</label>
+                        <div class="relative group">
+                            <i class="fa-solid fa-map absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                            {{ form.state }}
+                        </div>
+                    </div>
+                </div>
+
+                <label class="py-4 px-6 bg-gray-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-cultura-green/5 transition-all border border-transparent hover:border-cultura-green/10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-cultura-terracotta shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-display font-black text-cultura-dark uppercase tracking-wide">Endereço Principal</p>
+                            <p class="text-[9px] text-gray-400 font-medium">Usar este endereço como padrão para entregas e serviços.</p>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center">
+                        {{ form.is_main }}
+                    </div>
+                </label>
+
+                <!-- Form Actions -->
+                <div class="pt-4 flex flex-col md:flex-row gap-4">
+                    <button type="submit" 
+                            hx-indicator="#submit-spinner"
+                            class="flex-grow py-5 bg-cultura-dark text-white rounded-full text-[10px] font-display font-black uppercase tracking-[0.2em] hover:bg-cultura-green transition-all duration-500 shadow-premium active:scale-95 flex items-center justify-center gap-2">
+                        <span id="submit-spinner" class="htmx-indicator">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </span>
+                        {% if address %}Confirmar Alterações{% else %}Consolidar Endereço{% endif %}
+                    </button>
+                    <button type="button" 
+                            onclick="document.getElementById('address-modal').classList.add('opacity-0', 'scale-95'); setTimeout(() => document.getElementById('address-modal').remove(), 300)" 
+                            class="md:px-10 py-5 bg-white text-gray-400 border border-gray-100 rounded-full text-[10px] font-display font-black uppercase tracking-widest hover:text-red-500 hover:bg-red-50 hover:border-red-100 transition-all">
+                        Desistir
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Localizando...';
+            btn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                document.querySelector('[name="latitude"]').value = parseFloat(lat).toFixed(6);
+                document.querySelector('[name="longitude"]').value = parseFloat(lon).toFixed(6);
+                
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const addr = data.address;
+                        if (document.querySelector('[name="zip_code"]'))
+                            document.querySelector('[name="zip_code"]').value = (addr.postcode || '').replace(/\D/g, '').substring(0, 8);
+                        if (document.querySelector('[name="street"]'))
+                            document.querySelector('[name="street"]').value = addr.road || addr.suburb || '';
+                        if (document.querySelector('[name="neighborhood"]'))
+                            document.querySelector('[name="neighborhood"]').value = addr.suburb || addr.neighbourhood || '';
+                        if (document.querySelector('[name="city"]'))
+                            document.querySelector('[name="city"]').value = addr.city || addr.town || addr.village || '';
+                        
+                        if (document.querySelector('[name="state"]')) {
+                            let state = addr.state || '';
+                            if (addr['ISO3166-2-lvl4']) {
+                                state = addr['ISO3166-2-lvl4'].split('-').pop().toUpperCase();
+                            }
+                            document.querySelector('[name="state"]').value = state;
+                        }
+                        
+                        const numberField = document.querySelector('[name="number"]');
+                        if (numberField) numberField.focus();
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    });
+            }, () => {
+                alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            });
+        } else {
+            alert("Geolocalização não suportada pelo seu navegador.");
+        }
+    }
+
+    function lookupZip(zip) {
+        zip = zip.replace(/\D/g, '');
+        if (zip.length === 8) {
+            fetch(`https://viacep.com.br/ws/${zip}/json/`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.erro) {
+                        if (document.querySelector('[name="street"]')) document.querySelector('[name="street"]').value = data.logradouro;
+                        if (document.querySelector('[name="neighborhood"]')) document.querySelector('[name="neighborhood"]').value = data.bairro;
+                        if (document.querySelector('[name="city"]')) document.querySelector('[name="city"]').value = data.localidade;
+                        if (document.querySelector('[name="state"]')) document.querySelector('[name="state"]').value = data.uf;
+                        
+                        const numberField = document.querySelector('[name="number"]');
+                        if (numberField) numberField.focus();
+
+                        updateCoordsFromAddress();
+                    }
+                });
+        }
+    }
+
+    let geocodeTimeout;
+    function updateCoordsFromAddress() {
+        clearTimeout(geocodeTimeout);
+        geocodeTimeout = setTimeout(() => {
+            const street = document.querySelector('[name="street"]').value;
+            const number = document.querySelector('[name="number"]').value;
+            const neighborhood = document.querySelector('[name="neighborhood"]').value;
+            const city = document.querySelector('[name="city"]').value;
+            const state = document.querySelector('[name="state"]').value;
+
+            if (street && city && state) {
+                const addrStr = `${street}, ${number}, ${neighborhood}, ${city}, ${state}, Brasil`;
+                fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addrStr)}&format=json&limit=1`)
+                    .then(r => r.json())
+                    .then(geo => {
+                        if (geo.length > 0) {
+                            document.querySelector('[name="latitude"]').value = parseFloat(geo[0].lat).toFixed(6);
+                            document.querySelector('[name="longitude"]').value = parseFloat(geo[0].lon).toFixed(6);
+                        }
+                    });
+            }
+        }, 1000);
+    }
+
+    // Attach listeners to address fields
+    ['street', 'number', 'neighborhood', 'city', 'state'].forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+            field.addEventListener('input', updateCoordsFromAddress);
+        }
+    });
+</script>
+
+<style>
+    #address-modal input:not([type="checkbox"]), #address-modal select, #address-modal textarea {
+        width: 100%;
+        padding: 1.25rem 1.5rem 1.25rem 3.5rem !important;
+        background-color: #F9FAFB !important;
+        border-radius: 1.25rem !important;
+        border: 1px solid #F3F4F6 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        transition: all 0.3s;
+    }
+    #address-modal input:focus, #address-modal select:focus, #address-modal textarea:focus {
+        background-color: white !important;
+        border-color: #81B29A !important;
+        box-shadow: 0 0 0 4px rgba(129, 178, 154, 0.1) !important;
+        outline: none;
+    }
+    #address-modal input[type="checkbox"] {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        width: 3rem !important;
+        height: 1.5rem !important;
+        background-color: #E5E7EB !important;
+        border-radius: 2rem !important;
+        position: relative !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        outline: none !important;
+    }
+    #address-modal input[type="checkbox"]:checked {
+        background-color: #E07A5F !important;
+    }
+    #address-modal input[type="checkbox"]::after {
+        content: '';
+        position: absolute;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background-color: white !important;
+        top: 0.2rem;
+        left: 0.2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    #address-modal input[type="checkbox"]:checked::after {
+        left: 1.7rem;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+</style>

@@ -1,0 +1,30 @@
+<form method="POST" enctype="multipart/form-data" action="{% url 'post:edit_post' post.id %}" class="space-y-6">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+        {{ form.title }}
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+        {{ form.content }}
+    </div>
+
+    {% if form.thumbnail %}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Imagem</label>
+        {{ form.thumbnail }}
+    </div>
+    {% endif %}
+
+    <div class="flex justify-end space-x-3">
+        <button type="button" class="cancel-edit-btn px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">
+            Cancelar
+        </button>
+        <button type="submit" class="px-5 py-2 bg-brand-gold text-brand-brown font-semibold rounded-md hover:bg-yellow-500 transition">
+            Salvar
+        </button>
+    </div>
+</form>

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Novo Produto - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light min-h-screen py-24">
+    <div class="container mx-auto px-6">
+        <div class="max-w-3xl mx-auto glass rounded-[4rem] p-12 md:p-20 border-white shadow-premium">
+            <div class="mb-12 text-center md:text-left">
+                <div class="inline-flex items-center gap-3 mb-4">
+                    <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+                    <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Economia Criativa</span>
+                </div>
+                <h1 class="font-serif italic text-4xl md:text-6xl text-cultura-dark">Adicionar <br> <span class="not-italic font-display font-black text-cultura-terracotta/20">Produto</span></h1>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-3 px-4">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <p class="text-[9px] text-gray-400 mt-2 px-4 uppercase tracking-wider">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <p class="text-red-500 text-[10px] mt-2 px-4 font-bold">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pt-8">
+                    <button type="submit" class="group w-full py-6 rounded-full bg-cultura-dark text-white font-display font-black uppercase tracking-widest text-sm shadow-premium hover:bg-cultura-terracotta transition-all hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-check group-hover:scale-125 transition-transform"></i> Salvar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<style>
+    .glass-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        border: 2px solid white;
+        border-radius: 1.5rem;
+        padding: 1rem 1.5rem;
+        font-family: 'Inter', sans-serif;
+        color: #1a1a1a;
+        transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+        background: white;
+        border-color: #e07a5f; /* cultura-terracotta */
+        outline: none;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .glass-checkbox {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        border: 2px solid white;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

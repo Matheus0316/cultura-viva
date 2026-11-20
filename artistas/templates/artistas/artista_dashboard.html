@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ateliê Digital - {{ artista.name }}{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light pt-12 pb-32 min-h-screen">
+    <div class="container mx-auto px-6 max-w-6xl">
+        
+        <!-- Premium Dashboard Header -->
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8 mb-16" data-aos="fade-down">
+            <div>
+                <div class="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-full shadow-premium mb-6">
+                    <span class="w-1.5 h-1.5 bg-cultura-green rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+                    <span class="text-[9px] font-display font-black uppercase tracking-widest text-cultura-dark">Área de Criação</span>
+                </div>
+                <h1 class="font-serif italic text-5xl md:text-7xl text-cultura-dark leading-tight">Ateliê Digital</h1>
+            </div>
+            
+            <a href="{% url 'artistas:artista_post_create' %}"
+                class="group flex items-center gap-4 bg-cultura-dark text-white px-10 py-5 rounded-full text-[10px] font-display font-black uppercase tracking-[0.2em] hover:bg-cultura-green transition-all duration-500 shadow-premium">
+                <i class="fa-solid fa-wand-magic-sparkles text-sm group-hover:rotate-12 transition-transform"></i>
+                Nova Obra
+            </a>
+        </div>
+
+        <!-- Identity Card -->
+        <div class="bg-white rounded-[3rem] shadow-premium p-10 mb-20 border border-gray-50 overflow-hidden relative group" data-aos="fade-up">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-cultura-sand-light rounded-full blur-3xl opacity-50 group-hover:bg-cultura-green/10 transition-colors duration-700"></div>
+            
+            <div class="flex flex-col md:flex-row items-center gap-10 relative z-10">
+                <div class="relative">
+                    <img src="{{ artista.photo_url }}"
+                        class="w-32 h-32 rounded-full object-cover border-4 border-cultura-sand-light shadow-sm group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 rounded-full border border-cultura-green/20"></div>
+                </div>
+                
+                <div class="flex-grow text-center md:text-left">
+                    <h2 class="font-serif italic text-4xl text-cultura-dark mb-2">{{ artista.name }}</h2>
+                    <div class="flex flex-wrap justify-center md:justify-start items-center gap-4 text-[9px] font-display font-black text-gray-300 uppercase tracking-widest">
+                        <span class="px-4 py-1.5 bg-cultura-sand-light rounded-full text-cultura-dark">{{ artista.get_category_display }}</span>
+                        <span>Identidade #ART{{ artista.id|stringformat:"04d" }}</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-4">
+                    <a href="{% url 'artistas:artista_detail' artista.id %}"
+                        class="px-8 py-4 bg-white border border-gray-100 text-gray-400 rounded-full text-[9px] font-display font-black uppercase tracking-widest hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+                        Observar Perfil Público
+                    </a>
+                    
+                    <button hx-get="{% url 'artistas:artista_edit' artista.id %}"
+                        hx-target="#modal-container"
+                        class="px-8 py-4 bg-cultura-sand-light text-cultura-dark rounded-full text-[9px] font-display font-black uppercase tracking-widest hover:bg-cultura-yellow transition-all">
+                        <i class="fa-solid fa-pen-nib mr-2"></i> Ajustar Identidade
+                    </button>
+
+                    <button hx-get="{% url 'artistas:artista_address_edit' %}"
+                        hx-target="#modal-container"
+                        class="px-8 py-4 bg-cultura-dark text-white rounded-full text-[9px] font-display font-black uppercase tracking-widest hover:bg-cultura-green transition-all">
+                        <i class="fa-solid fa-location-dot mr-2"></i> Endereço Fixo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- content Stream -->
+        <div class="mb-12 flex items-center justify-between border-b border-gray-100 pb-8" data-aos="fade-up">
+            <h3 class="font-serif italic text-3xl text-cultura-dark">Minhas Expressões</h3>
+            <span class="text-[9px] font-display font-black text-gray-300 uppercase tracking-widest">{{ posts.count }} Obras Publicadas</span>
+        </div>
+
+        {% if posts %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10" data-aos="fade-up">
+            {% for post in posts %}
+            <article class="group bg-white rounded-[2.5rem] shadow-premium hover:shadow-premium-hover transition-all duration-1000 overflow-hidden border border-gray-50">
+                <div class="relative overflow-hidden aspect-[4/3]">
+                    <img src="{{ post.thumbnail_url }}" class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110">
+                    <div class="absolute inset-0 bg-cultura-dark/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                
+                <div class="p-8">
+                    <span class="text-[8px] font-display font-bold text-gray-300 uppercase tracking-widest mb-3 block">
+                        {{ post.created_at|date:"d \d\e F, Y" }}
+                    </span>
+                    <h4 class="font-serif italic text-2xl text-cultura-dark mb-8 truncate group-hover:text-cultura-green transition-colors">
+                        {{ post.title|default:"Sem Título" }}
+                    </h4>
+                    
+                    <div class="flex items-center justify-between pt-8 border-t border-gray-50">
+                        <a href="{% url 'artistas:artista_detail' artista.id %}" class="text-[9px] font-display font-black text-cultura-green uppercase tracking-widest hover:tracking-[0.2em] transition-all">
+                            Contemplar Obra
+                        </a>
+                        <div class="flex gap-2">
+                             <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-300 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-ellipsis"></i>
+                             </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="py-40 text-center glass rounded-[4rem] border-2 border-dashed border-gray-200" data-aos="fade-up">
+            <div class="w-24 h-24 bg-cultura-sand rounded-full flex items-center justify-center mx-auto mb-8 text-gray-200 text-4xl">
+                <i class="fa-solid fa-paintbrush"></i>
+            </div>
+            <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Silêncio Criativo</h3>
+            <p class="text-gray-400 font-light max-w-sm mx-auto">Sua galeria ainda aguarda o primeiro traço. Comece sua jornada compartilhando sua arte com a comunidade.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

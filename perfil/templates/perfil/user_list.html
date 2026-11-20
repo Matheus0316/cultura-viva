@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Curadoria de Guardiões - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light pt-12 pb-32 min-h-screen">
+    <div class="container mx-auto px-6 max-w-6xl">
+        
+        <!-- Premium Header -->
+        <div class="max-w-3xl mb-16" data-aos="fade-up">
+            <div class="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-full shadow-premium mb-6">
+                <span class="w-1.5 h-1.5 bg-cultura-green rounded-full"></span>
+                <span class="text-[9px] font-display font-black uppercase tracking-widest text-cultura-dark">Módulo Administrativo</span>
+            </div>
+            <h1 class="font-serif italic text-5xl text-cultura-dark mb-6">Curadoria de Guardiões</h1>
+            <p class="text-gray-400 font-light text-lg">Gerenciamento centralizado de acessos, papéis e permissões da rede cultural.</p>
+        </div>
+
+        <!-- Advanced Search Input -->
+        <div class="mb-12" data-aos="fade-up">
+            <div class="relative max-w-2xl group">
+                <i class="fa-solid fa-id-card-clip absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-cultura-green transition-colors"></i>
+                <input type="text" name="q" value="{{ request.GET.q }}"
+                    hx-get="{% url 'perfil:user_list' %}"
+                    hx-trigger="keyup changed delay:500ms, search" 
+                    hx-target="#user-results"
+                    placeholder="Buscar guardião por nome, usuário ou email..."
+                    class="w-full pl-16 pr-8 py-6 bg-white rounded-[2.5rem] border-none focus:ring-4 focus:ring-cultura-green/10 text-sm font-display font-medium text-cultura-dark placeholder:text-gray-300 transition-all shadow-premium">
+                
+                <!-- HTMX Loading Indicator -->
+                <div class="htmx-indicator absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <span class="w-1 h-1 bg-cultura-green rounded-full animate-bounce"></span>
+                    <span class="w-1 h-1 bg-cultura-green rounded-full animate-bounce delay-100"></span>
+                    <span class="w-1 h-1 bg-cultura-green rounded-full animate-bounce delay-200"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table Container -->
+        <div id="user-results" class="min-h-[400px]" data-aos="fade-up">
+            {% include 'perfil/partials/user_list_results.html' %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

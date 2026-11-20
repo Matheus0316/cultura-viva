@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ artista.name }} - Artista Cultura Viva{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light min-h-screen pb-24">
+    <!-- Sophisticated Hero Section -->
+    <div class="relative">
+        <div class="h-80 md:h-[30rem] bg-cultura-dark relative overflow-hidden">
+            <div class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+            <!-- Dynamic Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-cultura-dark via-cultura-dark/40 to-transparent"></div>
+            <!-- Animated Background Circles -->
+            <div class="absolute -top-32 -right-32 w-96 h-96 bg-cultura-terracotta/10 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-cultura-green/10 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative -mt-40 md:-mt-52">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-end gap-10 md:gap-16">
+                <!-- Avatar with Premium Border -->
+                <div class="relative group" data-aos="zoom-in">
+                    <div class="absolute inset-0 bg-cultura-terracotta/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
+                    <div class="relative w-48 h-48 md:w-72 md:h-72 rounded-full border-[8px] md:border-[12px] border-white shadow-premium overflow-hidden z-10 transition-transform duration-1000 hover:scale-[1.03]">
+                        <img src="{{ artista.photo_url }}" alt="{{ artista.name }}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute -bottom-2 right-4 md:bottom-4 md:right-8 z-20">
+                        <span class="inline-flex items-center gap-2 bg-cultura-terracotta text-white text-[10px] md:text-[11px] font-display font-black uppercase tracking-[0.2em] px-6 py-2.5 rounded-full shadow-2xl border-4 border-white">
+                            {{ artista.get_category_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Identity Summary -->
+                <div class="flex-grow pb-6 text-center md:text-left" data-aos="fade-up" data-aos-delay="200">
+                    <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-6">
+                        <span class="w-1.5 h-1.5 bg-cultura-yellow rounded-full"></span>
+                        <span class="text-white font-display font-bold text-[9px] tracking-[0.3em] uppercase">Talento Tacimense</span>
+                    </div>
+                    <h1 class="font-serif italic text-5xl md:text-8xl text-white mb-6 leading-tight drop-shadow-2xl">
+                        {{ artista.name }}
+                    </h1>
+                    
+                    <!-- Sophisticated Social & Action Container -->
+                    <div class="flex flex-col md:flex-row items-center md:items-end justify-between gap-8">
+                        <div class="flex flex-wrap justify-center md:justify-start items-center gap-6 text-white/40">
+                            {% if artista.instagram %}
+                            <a href="{{ artista.instagram }}" target="_blank" class="hover:text-cultura-terracotta transition-all duration-500 hover:-translate-y-1" title="Instagram">
+                                <i class="fa-brands fa-instagram text-2xl"></i>
+                            </a>
+                            {% endif %}
+                            {% if artista.youtube %}
+                            <a href="{{ artista.youtube }}" target="_blank" class="hover:text-red-500 transition-all duration-500 hover:-translate-y-1" title="YouTube">
+                                <i class="fa-brands fa-youtube text-2xl"></i>
+                            </a>
+                            {% endif %}
+                            {% if artista.whatsapp %}
+                            <a href="https://wa.me/55{{ artista.whatsapp }}" target="_blank" class="hover:text-cultura-green transition-all duration-500 hover:-translate-y-1" title="WhatsApp">
+                                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            </a>
+                            {% endif %}
+                            {% if artista.portfolio_link %}
+                            <a href="{{ artista.portfolio_link }}" target="_blank" class="hover:text-white transition-all duration-500 hover:-translate-y-1" title="Portfólio">
+                                <i class="fa-solid fa-globe text-xl"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center gap-10">
+                            <div class="text-center md:text-left group/stat">
+                                <span class="block text-white font-display font-black text-3xl group-hover:text-cultura-terracotta transition-colors">{{ followers_count }}</span>
+                                <span class="text-white/40 font-display font-bold text-[9px] uppercase tracking-[0.2em]">Seguidores</span>
+                            </div>
+                            
+                            {% if user.is_authenticated and user != artista.user %}
+                            <div id="follow-btn-container" class="scale-90 md:scale-100">
+                                {% include 'artistas/partials/follow_button.html' %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="container mx-auto px-6 mb-12 mt-20" data-aos="fade-up">
+        <div class="max-w-6xl mx-auto flex justify-center border-b border-gray-100">
+            <div class="flex gap-8 md:gap-16">
+                <button onclick="switchTab('feed')" id="tab-feed" class="pb-6 text-[10px] md:text-[11px] font-display font-black uppercase tracking-[0.3em] transition-all border-b-2 border-cultura-terracotta text-cultura-dark relative group">
+                    Feed Cultural
+                    <span class="absolute top-0 -right-2 w-2 h-2 bg-cultura-terracotta rounded-full animate-pulse"></span>
+                </button>
+                <button onclick="switchTab('shop')" id="tab-shop" class="pb-6 text-[10px] md:text-[11px] font-display font-black uppercase tracking-[0.3em] transition-all border-b-2 border-transparent text-gray-300 hover:text-cultura-dark">
+                    Loja & Serviços
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="container mx-auto px-6 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            
+            <!-- Feed / Shop Container -->
+            <div class="lg:col-span-8">
+                
+                <!-- FEED TAB -->
+                <div id="section-feed" class="space-y-12 transition-all duration-500">
+                    
+                    <!-- Composer Trigger (Owner Only) -->
+                    {% if is_owner or user.is_superuser %}
+                    <div class="bg-white p-6 md:p-8 rounded-[3rem] shadow-premium mb-12 border border-gray-50 flex flex-col md:flex-row items-center gap-6" data-aos="fade-up">
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <img src="{{ request.user.perfil.avatar }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm ring-4 ring-cultura-sand">
+                        </div>
+                        
+                        <div class="flex-grow flex flex-col sm:flex-row gap-4 w-full">
+                            <a href="{% url 'artistas:artista_post_create' %}"
+                                class="flex-grow h-14 bg-cultura-sand-light rounded-2xl text-gray-500 font-display font-bold text-[10px] uppercase tracking-widest flex items-center justify-center px-8 hover:bg-cultura-terracotta hover:text-white transition-all shadow-sm group">
+                                <i class="fa-solid fa-feather-pointed mr-3 group-hover:rotate-12 transition-transform text-lg"></i>
+                                LANÇAR MANIFESTO
+                            </a>
+                            
+                            <a href="{% url 'artistas:artista_event_create' %}"
+                                class="h-14 bg-cultura-dark rounded-2xl text-white font-display font-black text-[10px] uppercase tracking-widest flex items-center justify-center px-8 hover:bg-cultura-terracotta transition-all shadow-premium hover:-translate-y-1">
+                                <i class="fa-solid fa-calendar-plus mr-3 text-lg"></i>
+                                Evento
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Events Section -->
+                    <div data-aos="fade-up">
+                        <div class="inline-flex items-center gap-3 mb-8">
+                            <span class="h-[2px] w-8 bg-cultura-green"></span>
+                            <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Agenda Cultural</span>
+                        </div>
+                        
+                        {% if events %}
+                        <div class="space-y-6">
+                            {% for event in events %}
+                            <a href="{% url 'events:event_detail' event.id %}" class="group flex items-center gap-6 bg-white p-6 rounded-[2.5rem] border border-gray-100 hover:shadow-premium transition-all">
+                                <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
+                                    <img src="{{ event.icon_url }}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-[9px] font-display font-black text-cultura-terracotta uppercase tracking-widest mb-1">{{ event.date|date:"d M, H:i" }}</p>
+                                    <h4 class="font-serif italic text-xl text-cultura-dark group-hover:text-cultura-terracotta transition-colors">{{ event.title }}</h4>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-200 group-hover:text-cultura-terracotta transition-colors mr-4"></i>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="py-16 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
+                            <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-[0.3em]">Nenhum evento agendado.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Posts Section -->
+                    <div class="space-y-12">
+                        <div class="inline-flex items-center gap-3 mb-4">
+                            <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+                            <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Ecos & Processos</span>
+                        </div>
+                        
+                        {% for post in posts %}
+                        <article class="group bg-white rounded-[3rem] shadow-sm hover:shadow-premium transition-all duration-700 overflow-hidden border border-gray-50 relative" data-aos="fade-up">
+                            <!-- Management Controls -->
+                            {% if request.user == artista.user or user.is_superuser %}
+                            <div class="absolute top-6 right-6 z-20">
+                                <div class="relative dropdown-container">
+                                    <button class="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full shadow-lg border border-gray-100 text-gray-400 hover:text-cultura-dark transition-all dropdown-toggle">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <div class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible scale-95 transition-all duration-300 origin-top-right dropdown-menu">
+                                        <div class="p-2">
+                                            <a href="{% url 'post:edit_post' post.id %}" class="flex items-center gap-3 px-4 py-3 text-[10px] font-display font-black uppercase tracking-widest text-gray-600 hover:bg-cultura-sand-light rounded-xl transition-colors edit-post-btn">
+                                                <i class="fa-solid fa-pen-to-square text-xs"></i> Lapidar
+                                            </a>
+                                            <a href="{% url 'post:post_delete' post.id %}" class="flex items-center gap-3 px-4 py-3 text-[10px] font-display font-black uppercase tracking-widest text-red-500 hover:bg-red-50 rounded-xl transition-colors delete-post-btn">
+                                                <i class="fa-solid fa-trash-can text-xs"></i> Remover
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <a href="{% url 'post:post_detail' post.id %}">
+                                <div class="relative h-80 overflow-hidden">
+                                    <img src="{{ post.thumbnail_url }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark/40 via-transparent to-transparent"></div>
+                                </div>
+                                
+                                <div class="p-10">
+                                    <div class="flex items-center gap-4 mb-6">
+                                        <img src="{{ post.author.avatar }}" class="w-10 h-10 rounded-xl object-cover ring-4 ring-cultura-sand">
+                                        <div>
+                                            <p class="font-display font-black text-[9px] uppercase tracking-widest text-cultura-dark">{{ post.author.user.username }}</p>
+                                            <p class="text-[8px] text-gray-400 uppercase tracking-widest">{{ post.created_at|date:"d M, H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    <h3 class="font-serif italic text-2xl text-cultura-dark mb-6 group-hover:text-cultura-terracotta transition-colors leading-tight line-clamp-2">
+                                        {{ post.title }}
+                                    </h3>
+                                    <div class="flex items-center justify-between pt-6 border-t border-gray-50">
+                                        <div class="flex gap-6">
+                                            <div class="flex items-center gap-2 text-gray-400">
+                                                <i class="fa-regular fa-comment text-sm"></i>
+                                                <span class="text-[10px] font-display font-bold">{{ post.comments.count }}</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[9px] font-display font-black uppercase tracking-[0.3em] text-cultura-terracotta">Ver mais <i class="fa-solid fa-arrow-right-long ml-2"></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                        {% empty %}
+                        <div class="py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100" data-aos="fade-up">
+                            <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-[0.3em]">Nenhuma publicação ainda.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- SHOP TAB -->
+                <div id="section-shop" class="hidden transition-all duration-500 pb-20">
+                    {% include 'shop/partials/shop_section.html' with products=products services=services is_owner=is_owner seller_type='artista' seller_id=artista.id %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="lg:col-span-4 space-y-12">
+                <!-- Artist Info Block -->
+                <div class="bg-white rounded-[3rem] p-10 shadow-premium border border-gray-50 sticky top-28" data-aos="fade-left">
+                    
+                    {% if is_owner or user.is_superuser %}
+                    <!-- Creative Control -->
+                    <div class="mb-10 p-6 bg-cultura-sand-light rounded-[2rem] border border-cultura-terracotta/10">
+                        <h4 class="font-display font-black text-[10px] text-cultura-terracotta uppercase tracking-[0.4em] mb-6">Controle Criativo</h4>
+                        <div class="space-y-4">
+                            <button hx-get="{% url 'artistas:artista_edit' artista.pk %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors w-full text-left">
+                                <i class="fa-solid fa-sliders text-sm"></i> Ajustar Identidade
+                            </button>
+                            <button hx-get="{% url 'artistas:artista_address_edit' %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors w-full text-left">
+                                <i class="fa-solid fa-location-dot text-sm"></i> Sede / Localização
+                            </button>
+                            <button hx-get="{% url 'artistas:artista_delivery_edit' %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors w-full text-left">
+                                <i class="fa-solid fa-truck-fast text-sm"></i> Configurar Entrega
+                            </button>
+                            <a href="{% url 'shop:service_settings' 'artista' artista.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors">
+                                <i class="fa-solid fa-calendar-check text-sm"></i> Agenda & Disponibilidade
+                            </a>
+                            <a href="{% url 'shop:dashboard' 'artista' artista.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors">
+                                <i class="fa-solid fa-chart-line text-sm"></i> Painel de Vendas
+                            </a>
+                            <button hx-get="{% url 'banking:bank_account_form' 'artista' artista.id %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-terracotta transition-colors w-full text-left">
+                                <i class="fa-solid fa-piggy-bank text-sm"></i> Dados Bancários
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Manifesto / Bio -->
+                    <div class="mb-12">
+                        <h3 class="font-serif italic text-2xl text-cultura-dark mb-6">Manifesto & Trajetória</h3>
+                        <div class="text-gray-500 font-light text-sm leading-relaxed mb-8 italic">
+                            {{ artista.bio|linebreaks }}
+                        </div>
+                        
+                        <div class="flex items-center gap-4 p-4 bg-cultura-sand-light rounded-2xl">
+                            <div class="w-10 h-10 rounded-full bg-cultura-terracotta flex items-center justify-center text-white">
+                                <i class="fa-solid fa-palette text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[8px] font-display font-black uppercase tracking-widest text-gray-400">Categoria</p>
+                                <p class="text-[11px] font-display font-black uppercase tracking-widest text-cultura-dark">
+                                    {{ artista.get_category_display }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supporters (Followers) -->
+                    <div class="mb-12">
+                        <h3 class="font-serif italic text-2xl text-cultura-dark mb-8">Conexões</h3>
+                        <div class="grid grid-cols-4 gap-4">
+                            {% for seguidor in artista.seguidores.all|slice:":12" %}
+                            <a href="{% url 'perfil:profile_detail' seguidor.perfil.id %}" class="relative group/membro" title="{{ seguidor.perfil.user.username }}">
+                                <img src="{{ seguidor.perfil.avatar }}" class="w-full aspect-square rounded-2xl object-cover shadow-sm group-hover/membro:ring-4 ring-cultura-terracotta/30 transition-all">
+                                <div class="absolute inset-0 bg-cultura-dark/40 rounded-2xl opacity-0 group-hover/membro:opacity-100 transition-opacity flex items-center justify-center">
+                                    <i class="fa-solid fa-eye text-white text-[10px]"></i>
+                                </div>
+                            </a>
+                            {% endfor %}
+                            {% if followers_count > 12 %}
+                            <div class="aspect-square bg-cultura-sand-light rounded-2xl flex items-center justify-center text-gray-400">
+                                <span class="text-[10px] font-display font-black">+{{ followers_count|add:"-12" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="container mx-auto px-6 mt-32 text-center" data-aos="fade-up">
+        <a href="{% url 'artistas:artista_list' %}"
+            class="group inline-flex items-center gap-6 text-gray-400 hover:text-cultura-dark font-display font-black text-[11px] uppercase tracking-[0.4em] transition-all">
+            <span class="w-12 h-px bg-gray-200 group-hover:w-20 transition-all duration-700 group-hover:bg-cultura-terracotta"></span> 
+            RETORNAR À GALERIA 
+            <span class="w-12 h-px bg-gray-200 group-hover:w-20 transition-all duration-700 group-hover:bg-cultura-terracotta"></span>
+        </a>
+    </div>
+
+    <!-- Redesigned Modals -->
+    <div id="edit-post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-4xl rounded-[4rem] shadow-2xl overflow-hidden relative" data-aos="zoom-in">
+            <button class="absolute top-10 right-10 w-12 h-12 bg-cultura-sand-light rounded-full text-gray-400 hover:text-cultura-dark transition cancel-edit-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-16">
+                <h2 class="font-serif italic text-4xl text-cultura-dark mb-10">Lapidar Memória</h2>
+                <div id="edit-form-container" class="max-h-[60vh] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-12 text-center" data-aos="zoom-in">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fa-solid fa-trash-can text-3xl"></i>
+            </div>
+            <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Confirmar Remoção?</h3>
+            <p class="text-gray-400 font-light mb-10">Esta ação tornará esta memória inacessível no acervo coletivo permanentemente.</p>
+            <div class="flex gap-4">
+                <button class="flex-grow py-5 rounded-full bg-cultura-sand-light text-gray-500 font-display font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition cancel-delete-btn">Cancelar</button>
+                <a href="#" id="confirm-delete-btn" class="flex-grow py-5 rounded-full bg-red-500 text-white font-display font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition shadow-lg shadow-red-200">Confirmar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Portal -->
+    <div id="modal-container"></div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    function switchTab(tab) {
+        const feedBtn = document.getElementById('tab-feed');
+        const shopBtn = document.getElementById('tab-shop');
+        const feedSection = document.getElementById('section-feed');
+        const shopSection = document.getElementById('section-shop');
+
+        if (tab === 'feed') {
+            feedBtn.classList.add('border-cultura-terracotta', 'text-cultura-dark');
+            feedBtn.classList.remove('border-transparent', 'text-gray-300');
+            shopBtn.classList.remove('border-cultura-terracotta', 'text-cultura-dark');
+            shopBtn.classList.add('border-transparent', 'text-gray-300');
+            
+            feedSection.classList.remove('hidden');
+            shopSection.classList.add('hidden');
+            window.scrollTo({ top: feedSection.offsetTop - 150, behavior: 'smooth' });
+        } else {
+            shopBtn.classList.add('border-cultura-terracotta', 'text-cultura-dark');
+            shopBtn.classList.remove('border-transparent', 'text-gray-300');
+            feedBtn.classList.remove('border-cultura-terracotta', 'text-cultura-dark');
+            feedBtn.classList.add('border-transparent', 'text-gray-300');
+            
+            shopSection.classList.remove('hidden');
+            feedSection.classList.add('hidden');
+            window.scrollTo({ top: shopSection.offsetTop - 150, behavior: 'smooth' });
+        }
+    }
+
+    $(document).ready(function () {
+        // Dropdown Logic
+        $(document).on('click', '.dropdown-toggle', function(e) {
+            e.stopPropagation();
+            const $menu = $(this).siblings('.dropdown-menu');
+            $('.dropdown-menu').not($menu).addClass('opacity-0 invisible scale-95');
+            $menu.toggleClass('opacity-0 invisible scale-95');
+        });
+
+        $(document).on('click', function() {
+            $('.dropdown-menu').addClass('opacity-0 invisible scale-95');
+        });
+
+        // Edit Post Modal
+        const editModal = $('#edit-post-modal');
+        const editFormContainer = $('#edit-form-container');
+
+        $(document).on('click', '.edit-post-btn', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    editFormContainer.html(data.html);
+                    editModal.removeClass('hidden');
+                }
+            });
+        });
+
+        $('.cancel-edit-btn').on('click', () => editModal.addClass('hidden'));
+
+        // Delete Post Modal
+        const deletePostModal = $('#delete-post-modal');
+        const confirmDeletePostBtn = $('#confirm-delete-btn');
+
+        $(document).on('click', '.delete-post-btn', function (e) {
+            e.preventDefault();
+            confirmDeletePostBtn.attr('href', $(this).attr('href'));
+            deletePostModal.removeClass('hidden');
+        });
+
+        $('.cancel-delete-btn').on('click', () => deletePostModal.addClass('hidden'));
+
+        confirmDeletePostBtn.on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('href'),
+                type: 'POST',
+                beforeSend: (xhr) => xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"),
+                dataType: 'json',
+                success: (data) => data.status === 'success' ? window.location.reload() : alert('Erro ao excluir.')
+            });
+        });
+    });
+</script>
+
+{% endblock %}

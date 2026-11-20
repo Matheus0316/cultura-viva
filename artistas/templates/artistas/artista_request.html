@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Cadastro de Artista - Cultura Viva{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand py-20 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 border-t-4 border-cultura-terracotta">
+
+            <div class="text-center mb-10">
+                <span class="text-cultura-terracotta font-bold uppercase tracking-widest text-xs">Junte-se a Nós</span>
+                <h1 class="font-serif text-3xl md:text-4xl font-bold text-cultura-dark mt-2">Cadastro de Artista</h1>
+                <p class="text-gray-500 mt-2 font-light">
+                    Preencha o formulário abaixo para solicitar seu perfil de artista na plataforma Cultura Viva Tacima.
+                </p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="flex flex-col text-left">
+                    <label class="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wide"
+                        for="{{ field.id_for_label }}">
+                        {{ field.label }} {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+
+                    {% if field.name == 'category' %}
+                    <div class="relative">
+                        {{ field }} <!-- Select customizado via CSS se necessário -->
+                    </div>
+                    {% else %}
+                    {{ field }}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                    <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+
+                    {% if field.errors %}
+                    <div class="text-red-500 text-xs mt-1">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full bg-cultura-terracotta hover:bg-cultura-dark text-white font-bold py-4 rounded-full transition duration-300 shadow-md uppercase tracking-wider text-sm transform hover:scale-[1.02]">
+                        Enviar Solicitação
+                    </button>
+                    <p class="text-center text-gray-400 text-xs mt-4">
+                        Sua solicitação será analisada pela nossa equipe.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- CSS Utilitário para os campos do ModelForm ficarem bonitos sem widget tweaks pesados -->
+<style>
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background-color: #f9fafb;
+        transition: all 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #E07A5F;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.1);
+    }
+
+    input[type="file"] {
+        padding: 0.5rem;
+        border: 1px dashed #d1d5db;
+        border-radius: 0.5rem;
+        background-color: #f9fafb;
+    }
+</style>
+{% endblock %}

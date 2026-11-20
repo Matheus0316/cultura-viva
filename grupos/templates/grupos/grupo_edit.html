@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Grupo: {{ grupo.name }}{% endblock %}
+
+{% block content %}
+<section class="bg-brand-cream py-12 md:py-20">
+    <div class="container mx-auto px-6">
+
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-xl w-full max-w-4xl mx-auto">
+
+            <h1 class="font-serif text-3xl md:text-4xl font-bold text-brand-brown mb-8 border-b pb-4">
+                Editar Grupo
+                <span class="block text-xl text-gray-600 font-sans font-normal mt-1">{{ grupo.name }}</span>
+            </h1>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg" role="alert">
+                    {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if message %}
+                <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg" role="alert">
+                    <p>{{ message.1 }}</p>
+                </div>
+                {% endif %}
+
+                <div class="space-y-6">
+                    <div>
+                        <label for="{{ form.name.id_for_label }}"
+                            class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Nome do Grupo
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.name.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.description.id_for_label }}"
+                            class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Descrição
+                        </label>
+                        {{ form.description }}
+                        <p class="text-xs text-gray-500 mt-1">Uma breve descrição sobre o grupo.</p>
+                        {% if form.description.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.description.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.category.id_for_label }}"
+                            class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Categoria
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.category.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.thumbnail.id_for_label }}"
+                            class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Imagem de Capa
+                        </label>
+
+                        {% if grupo.thumbnail_url %}
+                        <div class="mb-2">
+                            <p class="text-sm text-gray-600 mb-1">Imagem atual:</p>
+                            <img src="{{ grupo.thumbnail_url }}" alt="Thumbnail atual"
+                                class="w-48 h-auto rounded-md object-cover border">
+                        </div>
+                        {% endif %}
+
+                        {{ form.thumbnail }}
+                        <p class="text-xs text-gray-500 mt-1">Deixe em branco para manter a imagem atual.</p>
+
+                        {% if form.thumbnail.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.thumbnail.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t mt-8 flex justify-end space-x-3">
+                    <a href="{% url 'grupos:grupo_detail' grupo.id %}"
+                        class="px-6 py-3 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition font-semibold">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                        class="px-6 py-3 rounded-md text-white bg-brand-brown hover:bg-opacity-80 transition font-semibold">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

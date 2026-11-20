@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Criar Novo Evento{% endblock %}
+
+{% block content %}
+<section class="bg-brand-cream py-12 md:py-20">
+    <div class="container mx-auto px-6">
+
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-xl w-full max-w-4xl mx-auto">
+
+            <h1 class="font-serif text-3xl md:text-4xl font-bold text-brand-brown mb-8 border-b pb-4">
+                Criar Novo Evento
+            </h1>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="space-y-6">
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Título do Evento
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.title.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Descrição
+                        </label>
+                        {{ form.description }}
+                        <p class="text-xs text-gray-500 mt-1">Descreva os detalhes do evento.</p>
+                        {% if form.description.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.description.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.date.id_for_label }}" class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Data e Hora do Evento
+                        </label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.date.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    {{ form.grupo }}
+
+                    <div>
+                        <label for="{{ form.icon.id_for_label }}" class="block text-lg font-serif font-bold text-brand-brown mb-2">
+                            Imagem de Capa
+                        </label>
+                        {{ form.icon }}
+                        <p class="text-xs text-gray-500 mt-1">Uma imagem de capa para o evento (opcional).</p>
+                        {% if form.icon.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.icon.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t mt-8 flex justify-end space-x-3">
+                    <a href="{% url 'events:event_list' %}" class="px-6 py-3 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition font-semibold">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-6 py-3 rounded-md text-white bg-brand-brown hover:bg-opacity-80 transition font-semibold">
+                        Criar Evento
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

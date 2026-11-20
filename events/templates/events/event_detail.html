@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+
+<section class="relative h-[40vh] md:h-[45vh] bg-cover bg-center text-white"
+         style="background-image: url('{{ event.icon_url }}');">
+    <div class="absolute inset-0 bg-brand-brown opacity-70"></div>
+    <div class="relative z-10 container mx-auto px-6 h-full flex flex-col justify-center items-center text-center">
+
+        <h1 class="font-serif text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+            {{ event.title }}
+        </h1>
+
+        <div class="font-semibold text-lg md:text-2xl text-brand-gold bg-black bg-opacity-30 px-5 py-3 rounded-lg shadow-lg">
+            <i class="fa-regular fa-calendar-alt mr-2"></i>
+            {{ event.date|date:"d \d\e F \d\e Y \à\s H:i" }}
+        </div>
+
+        <div class="mt-8">
+            {% now "U" as current_time_unix %}
+            {% if user.is_authenticated and event.date|date:"U" > current_time_unix %}
+
+                {% if is_riminder %}
+                    <a href="{% url 'events:event_reminder_cancel' event.id %}"
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full ...">
+                        <i class="fa-regular fa-bell-slash mr-2"></i>
+                        Cancelar Lembrete
+                    </a>
+                {% else %}
+                    <a href="{% url 'events:event_reminder' event.id %}"
+                    class="bg-brand-gold hover:bg-yellow-500 text-brand-brown font-bold py-3 px-8 ...">
+                        <i class="fa-regular fa-bell mr-2"></i>
+                        Receber Lembrete
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="bg-brand-cream py-12">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+
+            <div class="lg:col-span-2 bg-white p-6 md:p-10 rounded-lg shadow-lg">
+                <h2 class="font-serif text-3xl font-bold text-brand-brown mb-6 border-b pb-4">
+                    Sobre o Evento
+                </h2>
+                <div class="text-gray-800 space-y-4 text-lg leading-relaxed prose max-w-none">
+                    {{ event.description|safe|linebreaks|default:"Nenhuma descrição fornecida." }}
+                </div>
+            </div>
+
+            <aside class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-lg lg:sticky lg:top-28">
+
+                    {% if user.is_superuser or user == event.artista.user %}
+                    <div class="mb-6 p-4 bg-yellow-50 border border-brand-gold rounded-lg shadow-sm">
+                        <h4 class="font-serif font-bold text-brand-brown mb-3 flex items-center">
+                            <i class="fa-solid fa-shield-halved mr-2 text-cultura-terracotta"></i>
+                            Gestão do Evento
+                        </h4>
+                        <div class="space-y-3">
+                            <button hx-get="{% url 'events:event_edit' event.id %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center w-full text-sm font-bold text-brand-brown hover:text-cultura-terracotta transition-colors duration-200">
+                                <i class="fa-solid fa-pencil mr-2 text-xs"></i>
+                                Editar Informações
+                            </button>
+
+                            <button type="button"
+                                    id="delete-event-trigger-btn"
+                                    data-url="{% url 'events:event_delete' event.id %}" 
+                                    class="flex items-center w-full text-sm font-bold text-red-600 hover:text-red-800 transition-colors duration-200">
+                                 <i class="fa-solid fa-trash mr-2 text-xs"></i>
+                                Excluir Evento
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h3 class="font-serif text-2xl font-bold text-brand-brown border-b pb-3 mb-5">
+                        Detalhes
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <i class="fa-solid fa-calendar-days fa-lg text-brand-gold mt-1 w-6 text-center"></i>
+                            <div class="ml-4">
+                                <strong class="text-brand-brown text-lg">Quando</strong>
+                                <p class="text-gray-700">{{ event.date|date:"l, d \d\e F \d\e Y" }}</p>
+                                <p class="text-gray-700">Às {{ event.date|date:"H:i" }}</p>
+                            </div>
+                        </div>
+                        {% if event.location %}
+                        <div class="flex items-start">
+                            <i class="fa-solid fa-location-dot fa-lg text-brand-gold mt-1 w-6 text-center"></i>
+                            <div class="ml-4">
+                                <strong class="text-brand-brown text-lg">Onde</strong>
+                                <p class="text-gray-700">{{ event.location|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'events:event_list' %}"
+                       class="block w-full text-center mt-8 px-6 py-3 rounded-md text-brand-brown bg-gray-200 hover:bg-gray-300 transition font-semibold">
+                        <i class="fa-solid fa-arrow-left mr-2 text-sm"></i>
+                        Ver Todos os Eventos
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<div id="delete-event-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md relative text-center">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+            <svg class="h-6 w-6 text-red-600" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <h3 class="font-serif text-2xl font-bold text-brand-brown mt-5">Excluir Evento</h3>
+        <div class="mt-2">
+            <p class="text-base text-gray-600">
+                Você tem certeza de que deseja excluir o evento
+                <strong class="font-semibold">"{{ event.title }}"</strong>?
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+                <strong class="text-red-700">Esta ação é irreversível.</strong>
+            </p>
+        </div>
+        <div class="mt-8 flex justify-center space-x-4">
+            <button type="button" class="cancel-delete-event-btn px-6 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition">
+                Cancelar
+            </button>
+            <button type="button" id="confirm-delete-event-btn" class="px-6 py-2 rounded-md text-white bg-red-600 hover:bg-red-700 transition font-semibold">
+                Sim, Excluir Evento
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+$(document).ready(function() {
+    // --- Lógica do Modal de Exclusão de EVENTO ---
+    const deleteEventModal = $('#delete-event-modal');
+    const confirmDeleteEventBtn = $('#confirm-delete-event-btn');
+    let eventDeleteUrl = ''; // Variável para guardar a URL
+
+    // Abrir modal de exclusão de EVENTO
+    $('#delete-event-trigger-btn').on('click', function(e) {
+        e.preventDefault();
+        eventDeleteUrl = $(this).data('url'); // Pega a URL do data-attribute
+        deleteEventModal.removeClass('hidden');
+    });
+
+    // Fechar modal de exclusão de EVENTO
+    $(document).on('click', '#delete-event-modal, .cancel-delete-event-btn', function(e) {
+        if ($(e.target).is('#delete-event-modal') || $(e.target).is('.cancel-delete-event-btn')) {
+            e.preventDefault();
+            deleteEventModal.addClass('hidden');
+            eventDeleteUrl = ''; // Limpa a URL
+        }
+    });
+
+    // Enviar exclusão de EVENTO via AJAX
+    confirmDeleteEventBtn.on('click', function(e) {
+        e.preventDefault();
+        if (!eventDeleteUrl) return; // Não faz nada se a URL estiver vazia
+
+        $.ajax({
+            url: eventDeleteUrl,
+            type: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            },
+            success: function(data) {
+                // Sucesso! Redireciona para a lista de eventos.
+                alert('Evento excluído com sucesso.');
+                window.location.href = "{% url 'events:event_list' %}";
+            },
+            error: function(xhr) {
+                console.error('Erro ao excluir evento via AJAX:', xhr.responseText);
+                alert('Ocorreu um erro inesperado. Tente novamente.');
+                deleteEventModal.addClass('hidden');
+                eventDeleteUrl = '';
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

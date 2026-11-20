@@ -1,0 +1,78 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    {% for event in events %}
+    <article class="group bg-white rounded-[2.5rem] shadow-premium hover:shadow-premium-hover transition-all duration-700 overflow-hidden border border-gray-100 flex flex-col h-full border-b-4 border-b-transparent hover:border-b-cultura-terracotta">
+        <div class="relative h-64 overflow-hidden">
+            <img src="{{ event.icon_url }}" alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+            
+            <!-- Dynamic Date Badge -->
+            <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 text-center min-w-[70px] shadow-sm border border-white/50 group-hover:bg-cultura-terracotta group-hover:border-cultura-terracotta transition-colors duration-500">
+                <span class="block text-2xl font-serif italic text-cultura-dark group-hover:text-white leading-none mb-1">{{ event.date|date:"d" }}</span>
+                <span class="block text-[9px] font-display font-black uppercase tracking-widest text-cultura-terracotta group-hover:text-white/80 transition-colors">{{ event.date|date:"M" }}</span>
+            </div>
+
+            <!-- Category Badge -->
+            <div class="absolute bottom-6 left-6">
+                <span class="bg-cultura-dark/40 backdrop-blur shadow-sm text-white text-[9px] font-display font-black px-4 py-2 rounded-full uppercase tracking-widest">
+                    {% if event.is_city_event %}GESTÃO MUNICIPAL{% else %}INICIATIVA ARTÍSTICA{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="p-10 flex-grow flex flex-col">
+            <h3 class="font-serif italic text-2xl text-cultura-dark mb-4 group-hover:text-cultura-terracotta transition-colors leading-tight">{{ event.title }}</h3>
+            <p class="text-gray-500 font-light text-sm leading-relaxed mb-8 line-clamp-3">
+                {{ event.description|safe|default:"Exploração da identidade cultural tacimense através desta manifestação."|truncatewords:40 }}
+            </p>
+            
+            <div class="mt-auto pt-8 border-t border-gray-50 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fa-solid fa-location-dot text-xs text-cultura-terracotta/40"></i>
+                    <span class="text-[10px] font-display font-bold uppercase tracking-wider">Tacima, PB</span>
+                </div>
+                <a href="{% url 'events:event_detail' event.id %}" 
+                   class="group/link flex items-center gap-3 text-cultura-dark font-display font-black text-[10px] uppercase tracking-widest hover:text-cultura-terracotta transition-colors">
+                   VER DETALHES <i class="fa-solid fa-arrow-right-long group-hover/link:translate-x-2 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="col-span-full py-32 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
+        <div class="w-20 h-20 bg-cultura-sand-light rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-calendar-xmark text-2xl text-gray-300"></i>
+        </div>
+        <h3 class="text-xl font-serif italic text-cultura-dark mb-2">Nenhum evento no horizonte</h3>
+        <p class="text-gray-400 font-light text-sm">Tente ajustar seus filtros ou buscar por outros termos.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if events.has_other_pages %}
+<div class="mt-20 flex justify-center">
+    <nav class="flex items-center gap-2 p-2 bg-white rounded-full shadow-premium border border-gray-50">
+        {% with filter_params=filter_list|join:'&filter=' %}
+        
+        {% if events.has_previous %}
+        <a href="?page={{ events.previous_page_number }}&search={{ search }}{% if filter_list %}&filter={{ filter_params }}{% endif %}"
+           class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        <div class="px-6 py-2 bg-cultura-sand-light rounded-full">
+            <span class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest">
+                {{ events.number }} <span class="text-gray-400 mx-2">/</span> {{ events.paginator.num_pages }}
+            </span>
+        </div>
+
+        {% if events.has_next %}
+        <a href="?page={{ events.next_page_number }}&search={{ search }}{% if filter_list %}&filter={{ filter_params }}{% endif %}"
+           class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        {% endif %}
+
+        {% endwith %}
+    </nav>
+</div>
+{% endif %}

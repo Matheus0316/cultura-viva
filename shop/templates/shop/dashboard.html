@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Painel de Vendas - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light min-h-screen py-24">
+    <div class="container mx-auto px-6">
+        <div class="mb-12 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div>
+                <div class="inline-flex items-center gap-3 mb-4">
+                    <span class="h-[2px] w-8 bg-cultura-green"></span>
+                    <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Gestão & Finanças</span>
+                </div>
+                <h1 class="font-serif italic text-4xl md:text-6xl text-cultura-dark">Gestão de <br> <span class="not-italic font-display font-black text-cultura-green/20 text-shadow-sm">Vendas & Lucro</span></h1>
+                <p class="text-gray-500 mt-4 font-display font-medium max-w-lg leading-relaxed">Acompanhe seu desempenho financeiro, gerencie pedidos e realize saques de forma segura.</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4">
+                <a href="{% if seller_type == 'artista' %}{% url 'artistas:artista_detail' obj.id %}{% else %}{% url 'grupos:grupo_detail' obj.id %}{% endif %}" 
+                   class="px-8 py-5 rounded-2xl bg-white border border-gray-100 text-cultura-dark font-display font-bold text-[10px] uppercase tracking-widest hover:border-cultura-green hover:shadow-lg transition-all active:scale-95 flex items-center gap-3">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Perfil
+                </a>
+                <button onclick="window.location.reload()" 
+                        class="p-5 rounded-2xl bg-cultura-dark text-white hover:bg-cultura-green transition-all shadow-premium active:scale-95">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 💰 Financial Metrics & Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12" data-aos="fade-up">
+            <!-- Metric 1: Lucro Acumulado -->
+            <div class="bg-white rounded-[2.5rem] p-8 border border-white shadow-premium group hover:-translate-y-2 transition-all duration-500">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-12 w-12 rounded-2xl bg-cultura-green/10 text-cultura-green flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                    </div>
+                    <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Total Ganhos</span>
+                </div>
+                <h3 class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest mb-1">Lucro Acumulado</h3>
+                <p class="text-3xl font-display font-black text-cultura-dark">R$ {{ total_profit|floatformat:2 }}</p>
+                <div class="mt-4 flex items-center gap-2 text-[9px] font-bold text-cultura-green">
+                    <i class="fa-solid fa-circle-check"></i> 98% de suas vendas
+                </div>
+            </div>
+
+            <!-- Metric 2: Disponível para Saque -->
+            <div class="bg-cultura-dark rounded-[2.5rem] p-8 shadow-premium group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="h-12 w-12 rounded-2xl bg-white/10 text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-wallet text-xl"></i>
+                        </div>
+                        <span class="text-[9px] font-black text-white/30 uppercase tracking-widest">Disponível</span>
+                    </div>
+                    <h3 class="text-[10px] font-display font-black text-white/40 uppercase tracking-widest mb-1">Saldo para Saque</h3>
+                    <p class="text-3xl font-display font-black text-white">R$ {{ asaas_balance|floatformat:2 }}</p>
+                    <div class="mt-4">
+                        {% if asaas_balance > 5 %}
+                            <a href="https://www.asaas.com" target="_blank" class="text-[9px] font-black text-cultura-green uppercase hover:underline flex items-center gap-2">
+                                Realizar Saque no Asaas <i class="fa-solid fa-external-link"></i>
+                            </a>
+                        {% else %}
+                            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Mínimo R$ 5,00</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metric 3: Saldo Retido -->
+            <div class="bg-white rounded-[2.5rem] p-8 border border-white shadow-premium group hover:-translate-y-2 transition-all duration-500">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-12 w-12 rounded-2xl bg-cultura-terracotta/10 text-cultura-terracotta flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-lock text-xl"></i>
+                    </div>
+                    <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Retido</span>
+                </div>
+                <h3 class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest mb-1">Saldo Bloqueado</h3>
+                <p class="text-3xl font-display font-black text-cultura-dark">R$ {{ total_retained|floatformat:2 }}</p>
+                <div class="mt-4 space-y-1">
+                    <div class="text-[9px] font-bold text-cultura-green flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> R$ {{ pending_retained|floatformat:2 }} Confirmados
+                    </div>
+                    <div class="text-[9px] font-bold text-gray-400 flex items-center gap-2">
+                        <i class="fa-solid fa-clock"></i> R$ {{ expected_balance|floatformat:2 }} Aguardando Pagamento
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metric 4: Vendas Recentes (Gráfico Pequeno ou Info) -->
+            <div class="bg-white rounded-[2.5rem] p-8 border border-white shadow-premium group hover:-translate-y-2 transition-all duration-500 lg:col-span-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                    </div>
+                    <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Volume</span>
+                </div>
+                <p class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest mb-1">Volume de Vendas</p>
+                <div class="flex items-end gap-3">
+                    <span class="text-3xl font-display font-black text-cultura-dark">{{ orders.count|add:bookings.count }}</span>
+                    <span class="text-gray-300 text-[10px] font-bold mb-1.5 uppercase">Operações</span>
+                </div>
+                <div class="mt-4 h-8 w-full bg-gray-50 rounded-lg overflow-hidden flex gap-1 p-1">
+                    {% for val in chart_values|slice:":7" %}
+                        <div class="h-full bg-cultura-green/20 rounded-sm flex-grow" style="height: 50%"></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- 📈 Chart Section -->
+            <div class="lg:col-span-2" data-aos="fade-right">
+                <div class="bg-white rounded-[3rem] p-10 shadow-premium border border-white h-full relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-10">
+                        <div>
+                            <h3 class="font-display font-black text-sm text-cultura-dark uppercase tracking-widest">Desempenho Comercial</h3>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">Vendas Totais nos últimos 30 dias</p>
+                        </div>
+                        <div class="flex gap-2">
+                             <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-cultura-green/10 text-cultura-green text-[9px] font-black uppercase">
+                                <span class="w-2 h-2 rounded-full bg-cultura-green"></span> Tendência Positiva
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="h-[300px] w-full">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🏦 Banking & KYC -->
+            <div class="lg:col-span-1" data-aos="fade-left">
+                <div class="space-y-8 h-full">
+                    <!-- Status de Verificação -->
+                    <div class="bg-white rounded-[3rem] p-10 shadow-premium border border-white relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-cultura-green/5 rounded-full blur-3xl"></div>
+                        
+                        <div class="flex items-center gap-4 mb-8 relative z-10">
+                            <div class="h-10 w-10 rounded-xl {% if asaas_profile.status == 'APPROVED' %}bg-cultura-green{% else %}bg-cultura-terracotta{% endif %} text-white flex items-center justify-center">
+                                <i class="fa-solid {% if asaas_profile.status == 'APPROVED' %}fa-check-double{% else %}fa-id-card{% endif %}"></i>
+                            </div>
+                            <h2 class="font-display font-black text-sm text-cultura-dark uppercase tracking-widest">Identidade Digital</h2>
+                        </div>
+
+                        <div class="space-y-6 relative z-10">
+                            {% if asaas_profile %}
+                                <div>
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Status da Subconta</p>
+                                    <div class="inline-flex items-center gap-3 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest {% if asaas_profile.status == 'APPROVED' %}bg-green-50 text-green-600{% else %}bg-yellow-50 text-yellow-600{% endif %}">
+                                        <div class="relative flex h-2 w-2">
+                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full {% if asaas_profile.status == 'APPROVED' %}bg-green-400{% else %}bg-yellow-400{% endif %} opacity-75"></span>
+                                          <span class="relative inline-flex rounded-full h-2 w-2 {% if asaas_profile.status == 'APPROVED' %}bg-green-500{% else %}bg-yellow-500{% endif %}"></span>
+                                        </div>
+                                        {{ asaas_profile.get_status_display }}
+                                    </div>
+                                </div>
+
+                                {% if asaas_profile.status != 'APPROVED' %}
+                                    <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 mt-6 group">
+                                        <h4 class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest mb-3">Ações Pendentes</h4>
+                                        <p class="text-[10px] text-gray-400 mb-6 leading-relaxed font-medium italic">O Asaas requer uma verificação de segurança (foto e documentos) para habilitar seus saques e automatizar o recebimento.</p>
+                                        
+                                        {% if asaas_profile.kyc_link %}
+                                            <a href="{{ asaas_profile.kyc_link }}" target="_blank" class="w-full inline-flex items-center justify-center gap-4 px-6 py-5 bg-cultura-dark text-white rounded-2xl text-[10px] font-display font-black uppercase tracking-[0.2em] hover:bg-cultura-green transition-all shadow-premium active:scale-95 group-hover:shadow-lg">
+                                                Iniciar Verificação <i class="fa-solid fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+                                            </a>
+                                        {% else %}
+                                            <div class="flex items-center gap-3 text-yellow-600 font-display font-black text-[9px] uppercase italic">
+                                                <i class="fa-solid fa-spinner fa-spin"></i> Aguardando link de onboarding...
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="bg-green-50 rounded-2xl p-6 border border-green-100 flex items-center gap-4">
+                                        <div class="h-10 w-10 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg">
+                                            <i class="fa-solid fa-check"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-black text-green-700 uppercase tracking-widest">Conta Verificada</p>
+                                            <p class="text-[9px] text-green-600 font-bold">Saques e Splits ativos.</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="bg-gray-50 rounded-2xl p-8 border border-dashed border-gray-200 text-center">
+                                    <i class="fa-solid fa-cloud-bolt text-gray-200 text-3xl mb-4"></i>
+                                    <p class="text-[10px] text-gray-400 leading-relaxed font-medium italic">Sua subconta no Asaas será criada automaticamente após sua primeira venda.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Dados Bancários Simplificados -->
+                    <div class="bg-white rounded-[3rem] p-10 shadow-premium border border-white">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-4">
+                                <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center">
+                                    <i class="fa-solid fa-bank"></i>
+                                </div>
+                                <h2 class="font-display font-black text-sm text-cultura-dark uppercase tracking-widest">Conta Destino</h2>
+                            </div>
+                            <button onclick="document.getElementById('edit-bank-account').click()" class="text-cultura-green text-xs hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </div>
+                        {% include 'banking/partials/bank_account_info.html' %}
+                        <div class="hidden">
+                            <button id="edit-bank-account" hx-get="{% url 'banking:update_bank_account' seller_type seller_id %}" hx-target="#modal-container"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Agenda / Serviços -->
+            <div class="space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-display font-black text-xl text-cultura-dark uppercase tracking-wider">Próximos Agendamentos</h2>
+                    <span class="px-4 py-1 rounded-full bg-cultura-green/10 text-cultura-green text-[10px] font-bold">{{ bookings.count }} TOTAL</span>
+                </div>
+
+                {% if bookings %}
+                <div class="space-y-4">
+                    {% for booking in bookings %}
+                    <div class="glass rounded-[2rem] p-8 border-white hover:border-cultura-green/30 transition-all group">
+                        <div class="flex flex-col md:flex-row justify-between gap-6">
+                            <div class="flex gap-6">
+                                <div class="h-16 w-16 rounded-2xl bg-cultura-green/10 flex items-center justify-center text-cultura-green">
+                                    <i class="fa-solid fa-calendar-day text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-display font-bold text-lg text-cultura-dark">{{ booking.service.name }}</h3>
+                                    <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Cliente: {{ booking.client.get_full_name|default:booking.client.username }}</p>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-cultura-green flex items-center gap-2 mb-2">
+                                        <i class="fa-solid fa-location-dot"></i> Local: {{ booking.address.street }}, {{ booking.address.number }}
+                                    </p>
+                                    <div class="flex flex-wrap gap-6">
+                                        <div>
+                                            <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Seu Ganho Líquido</p>
+                                            <span class="text-cultura-green font-display font-black text-sm">R$ {{ booking.net_earning }}</span>
+                                        </div>
+                                        <div class="border-l border-gray-100 pl-4">
+                                            <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Valor Venda</p>
+                                            <span class="text-gray-400 text-xs font-bold">R$ {{ booking.total_price }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-end justify-between">
+                                <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                    {% if booking.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+                                    {% elif booking.status == 'CONFIRMED' %}bg-green-100 text-green-700
+                                    {% elif booking.status == 'CANCELLED' %}bg-red-100 text-red-700
+                                    {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+
+                                <form action="{% url 'shop:update_booking_status' booking.id %}" method="POST" class="mt-4 flex gap-2">
+                                    {% csrf_token %}
+                                    <select name="status" onchange="this.form.submit()" class="bg-white/50 border-none rounded-xl text-[9px] font-bold uppercase tracking-widest py-2 px-4 focus:ring-cultura-green">
+                                        <option value="" disabled selected>Alterar Status</option>
+                                        {% for code, label in booking.STATUS_CHOICES %}
+                                        <option value="{{ code }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="glass rounded-[2rem] p-12 text-center border-white">
+                    <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-widest">Nenhum agendamento encontrado.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Pedidos / Produtos -->
+            <div class="space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-display font-black text-xl text-cultura-dark uppercase tracking-wider">Pedidos de Produtos</h2>
+                    <span class="px-4 py-1 rounded-full bg-cultura-dark/10 text-cultura-dark text-[10px] font-bold">{{ orders.count }} TOTAL</span>
+                </div>
+
+                {% if orders %}
+                <div class="space-y-4">
+                    {% for order in orders %}
+                    <div class="glass rounded-[2rem] p-8 border-white hover:border-cultura-dark/30 transition-all">
+                        <div class="flex flex-col md:flex-row justify-between gap-6">
+                            <div class="flex gap-6">
+                                <div class="h-16 w-16 rounded-2xl bg-cultura-dark/5 flex items-center justify-center text-cultura-dark">
+                                    <i class="fa-solid fa-box text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-display font-bold text-lg text-cultura-dark">{{ order.product.name }}</h3>
+                                    <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Comprador: {{ order.buyer.get_full_name|default:order.buyer.username }}</p>
+                                    <div class="mb-3">
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-cultura-terracotta flex items-center gap-2">
+                                            {% if order.pickup_on_site %}
+                                                <i class="fa-solid fa-store"></i> Retirada no Local
+                                            {% else %}
+                                                <i class="fa-solid fa-truck"></i> Entrega (Frete: R$ {{ order.shipping_cost }})
+                                                <br>
+                                                <span class="text-gray-400 font-normal normal-case ml-5">Destino: {{ order.shipping_address.street }}, {{ order.shipping_address.number }}</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <div>
+                                            <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Seu Ganho Líquido</p>
+                                            <span class="text-cultura-green font-display font-black text-sm">R$ {{ order.net_earning }}</span>
+                                        </div>
+                                        <div class="border-l border-gray-100 pl-4">
+                                            <p class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Valor Venda</p>
+                                            <span class="text-gray-400 text-xs font-bold">R$ {{ order.total_price }}</span>
+                                        </div>
+                                        <span class="text-gray-300 text-xs font-bold ml-auto">Qtd: {{ order.quantity }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-end justify-between">
+                                <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                    {% if order.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+                                    {% elif order.status == 'PAID' %}bg-blue-100 text-blue-700
+                                    {% elif order.status == 'DELIVERED' %}bg-green-100 text-green-700
+                                    {% elif order.status == 'CANCELLED' %}bg-red-100 text-red-700
+                                    {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+
+                                <form action="{% url 'shop:update_order_status' order.id %}" method="POST" class="mt-4 flex gap-2">
+                                    {% csrf_token %}
+                                    <select name="status" onchange="this.form.submit()" class="bg-white/50 border-none rounded-xl text-[9px] font-bold uppercase tracking-widest py-2 px-4 focus:ring-cultura-dark">
+                                        <option value="" disabled selected>Alterar Status</option>
+                                        {% for code, label in order.STATUS_CHOICES %}
+                                        <option value="{{ code }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="glass rounded-[2rem] p-12 text-center border-white">
+                    <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-widest">Nenhum pedido encontrado.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div id="modal-container"></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const labels = {{ chart_labels|safe }};
+        const values = {{ chart_values|safe }};
+        
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(34, 197, 94, 0.2)');
+        gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Vendas (R$)',
+                    data: values,
+                    borderColor: '#22C55E',
+                    borderWidth: 4,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#22C55E',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                        bodyFont: { family: 'Outfit', size: 14 },
+                        padding: 12,
+                        cornerRadius: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#F3F4F6', drawBorder: false },
+                        ticks: {
+                            font: { family: 'Outfit', size: 10, weight: '600' },
+                            color: '#9CA3AF',
+                            callback: function(value) { return 'R$ ' + value; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: 'Outfit', size: 10, weight: '600' },
+                            color: '#9CA3AF'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .glass {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        border: 2px solid white;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+    .shadow-premium {
+        box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+    }
+    .text-shadow-sm {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}

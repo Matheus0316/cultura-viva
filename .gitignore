@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Configurações locais e segredos
+.env
+.env.*
+!.env.example
+
+# Banco de dados local
+*.sqlite3
+*.sqlite3-journal
+
+# Arquivos enviados pelos usuários e mídias locais
+/media/*
+!/media/default_avatar.jpg
+!/media/default_group_thumbnail.jpg
+
+# Arquivos estáticos gerados pelo collectstatic
+/staticfiles/
+
+# Logs, cobertura e caches de ferramentas
+*.log
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Celery
+celerybeat-schedule
+
+# Ferramentas de desenvolvimento e sistema operacional
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp

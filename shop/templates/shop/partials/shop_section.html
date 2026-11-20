@@ -1,0 +1,388 @@
+<div class="lg:col-span-12" data-aos="fade-up">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+        <div>
+            <div class="inline-flex items-center gap-3 mb-4">
+                <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+                <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Economia Criativa</span>
+            </div>
+            <h2 class="font-serif italic text-4xl text-cultura-dark leading-tight">Loja & <br> <span class="not-italic font-display font-black text-cultura-terracotta/20">Agendamentos</span></h2>
+        </div>
+        {% if is_owner %}
+        <div class="flex gap-4">
+            <a href="{% url 'shop:product_create' seller_type seller_id %}" class="bg-cultura-dark text-white text-[9px] font-display font-black uppercase tracking-widest px-6 py-3 rounded-full hover:bg-cultura-terracotta transition-all">
+                <i class="fa-solid fa-plus mr-2"></i> Produto
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <!-- Products -->
+        {% for product in products %}
+        <div class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-premium transition-all duration-700 border border-gray-100 flex flex-col">
+            <div class="aspect-square relative overflow-hidden">
+                <a href="{% url 'shop:product_detail' product.id %}">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                </a>
+                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md rounded-full px-4 py-2 shadow-sm">
+                    <span class="text-cultura-dark font-display font-black text-xs">R$ {{ product.price }}</span>
+                </div>
+                {% if product.stock <= 0 %}
+                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                    <span class="text-white font-display font-black uppercase tracking-widest text-xs">Esgotado</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="p-8 flex flex-col flex-grow">
+                <h3 class="font-serif italic text-2xl text-cultura-dark mb-4">
+                    <a href="{% url 'shop:product_detail' product.id %}" class="hover:text-cultura-terracotta transition-colors">
+                        {{ product.name }}
+                    </a>
+                </h3>
+                <p class="text-gray-500 text-sm font-light mb-6 line-clamp-2">{{ product.description }}</p>
+                
+                <div class="mt-auto">
+                    <a href="{% url 'shop:product_detail' product.id %}" class="block w-full py-4 rounded-2xl bg-cultura-dark text-white text-[10px] font-display font-bold uppercase tracking-widest text-center hover:bg-cultura-terracotta transition-all active:scale-95">
+                        Ver Detalhes
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Services -->
+        {% for service in services %}
+        <div class="group bg-cultura-sand-light rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-premium transition-all duration-700 border border-white flex flex-col">
+            <div class="p-8 flex flex-col flex-grow">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-cultura-green/10 text-cultura-green text-[9px] font-display font-black px-4 py-2 rounded-full uppercase tracking-widest">
+                        Serviço / Agenda
+                    </span>
+                    <span class="text-cultura-dark font-display font-black text-xs">R$ {{ service.price }}</span>
+                </div>
+                <h3 class="font-serif italic text-2xl text-cultura-dark mb-4">
+                    <a href="{% url 'shop:service_detail' service.id %}" class="hover:text-cultura-green transition-colors">
+                        {{ service.name }}
+                    </a>
+                </h3>
+                <p class="text-gray-500 text-sm font-light mb-6">{{ service.description }}</p>
+                
+                <div class="flex items-center gap-4 mb-8 text-[10px] font-display font-black text-gray-400 uppercase tracking-widest">
+                    <i class="fa-solid fa-clock text-cultura-green"></i> {{ service.duration_hours }} HORAS
+                </div>
+
+                <div class="mt-auto space-y-4">
+                    {% if is_owner %}
+                    <a href="{% url 'shop:service_settings' seller_type seller_id %}" class="block w-full py-4 rounded-2xl bg-white border border-cultura-dark text-cultura-dark text-[10px] font-display font-bold uppercase tracking-widest text-center hover:bg-cultura-dark hover:text-white transition-all">
+                        Editar Agenda
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'shop:service_detail' service.id %}" class="block w-full py-4 rounded-2xl bg-cultura-green text-white text-[10px] font-display font-bold uppercase tracking-widest text-center hover:bg-cultura-dark transition-all active:scale-95">
+                        Ver Disponibilidade
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Modal -->
+        <div id="booking-modal-{{ service.id }}" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative animate-in fade-in zoom-in duration-300">
+                <button onclick="document.getElementById('booking-modal-{{ service.id }}').classList.add('hidden')" class="absolute top-8 right-8 text-gray-400 hover:text-cultura-dark transition-colors">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+                <h3 class="font-serif italic text-3xl text-cultura-dark mb-8">Agendar {{ service.name }}</h3>
+                <form action="{% url 'shop:process_booking' service.id %}" method="POST" class="space-y-6" id="booking-form-{{ service.id }}">
+                    {% csrf_token %}
+                    
+                    <!-- Calendar Container -->
+                    <div class="calendar-container">
+                        <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-4">1. Selecione o Dia</label>
+                        <div id="calendar-{{ service.id }}" class="grid grid-cols-7 gap-2 text-center">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- Time Slots Container -->
+                    <div id="slots-container-{{ service.id }}" class="hidden">
+                        <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-4">2. Selecione o Horário</label>
+                        <div id="slots-grid-{{ service.id }}" class="grid grid-cols-4 gap-3">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+
+                    <!-- Address Selection -->
+                    <div id="address-container-{{ service.id }}" class="hidden animate-in fade-in slide-in-from-top-4 duration-500">
+                        <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-4">3. Local de Realização</label>
+                        <div class="space-y-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                            {% for addr in user_addresses %}
+                            <label class="block relative group cursor-pointer">
+                                <input type="radio" name="address_id" value="{{ addr.id }}" {% if addr.is_main %}checked{% endif %} class="peer hidden">
+                                <div class="p-4 rounded-xl bg-cultura-sand-light border-2 border-transparent peer-checked:border-cultura-green peer-checked:bg-white transition-all group-hover:bg-white shadow-sm">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-[9px] text-gray-500 font-bold leading-tight">
+                                            {{ addr.street }}, {{ addr.number }} - {{ addr.neighborhood }}
+                                        </p>
+                                        <div class="w-3 h-3 rounded-full border-2 border-gray-300 peer-checked:border-cultura-green peer-checked:bg-cultura-green transition-all"></div>
+                                    </div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                            <button type="button" hx-get="{% url 'perfil:address_add' %}" hx-target="#modal-container" class="w-full py-3 border-2 border-dashed border-gray-100 rounded-xl text-[8px] font-display font-black uppercase tracking-widest text-gray-400 hover:border-cultura-green hover:text-cultura-green transition-all">
+                                + Novo Endereço
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Payment and Installments Group -->
+                    <div id="payment-and-installments-{{ service.id }}"
+                         hx-get="{% url 'shop:calculate_price' %}"
+                         hx-target="#price-summary-{{ service.id }}"
+                         hx-trigger="change"
+                         hx-vals='{"item_type": "service", "item_id": "{{ service.id }}"}'
+                         hx-include="[name='installments'],[name='payment_method']">
+                        
+                        <div id="payment-container-{{ service.id }}" class="hidden animate-in fade-in slide-in-from-top-4 duration-500">
+                            <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-4">4. Forma de Pagamento</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="block relative group cursor-pointer">
+                                    <input type="radio" name="payment_method" value="PIX" checked class="peer hidden" onchange="document.getElementById('installments-container-{{ service.id }}').classList.add('hidden')">
+                                    <div class="p-4 rounded-xl bg-cultura-sand-light border-2 border-transparent peer-checked:border-cultura-green peer-checked:bg-white transition-all group-hover:bg-white shadow-sm text-center">
+                                        <i class="fa-brands fa-pix text-lg mb-2 text-cultura-dark group-hover:text-cultura-green transition-colors"></i>
+                                        <p class="text-[8px] font-display font-black uppercase tracking-widest text-cultura-dark">Pix</p>
+                                    </div>
+                                </label>
+                                <label class="block relative group cursor-pointer">
+                                    <input type="radio" name="payment_method" value="CREDIT_CARD" class="peer hidden" onchange="document.getElementById('installments-container-{{ service.id }}').classList.remove('hidden')">
+                                    <div class="p-4 rounded-xl bg-cultura-sand-light border-2 border-transparent peer-checked:border-cultura-green peer-checked:bg-white transition-all group-hover:bg-white shadow-sm text-center">
+                                        <i class="fa-solid fa-credit-card text-lg mb-2 text-cultura-dark group-hover:text-cultura-green transition-colors"></i>
+                                        <p class="text-[8px] font-display font-black uppercase tracking-widest text-cultura-dark">Crédito</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Parcelamento -->
+                            <div id="installments-container-{{ service.id }}" class="hidden mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <label class="block text-[8px] font-display font-black uppercase tracking-widest text-gray-400 mb-2">Parcelas</label>
+                                <select name="installments" class="w-full bg-cultura-sand-light border-none rounded-xl text-[10px] font-bold uppercase tracking-widest py-4 px-6 focus:ring-cultura-green transition-all shadow-sm">
+                                    <option value="1">À Vista</option>
+                                    <option value="2">2x</option>
+                                    <option value="3">3x</option>
+                                    <option value="4">4x</option>
+                                    <option value="5">5x</option>
+                                    <option value="6">6x</option>
+                                    <option value="7">7x</option>
+                                    <option value="8">8x</option>
+                                    <option value="9">9x</option>
+                                    <option value="10">10x</option>
+                                    <option value="11">11x</option>
+                                    <option value="12">12x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Summary -->
+                    <div id="price-summary-{{ service.id }}" class="mt-8">
+                         {% include 'shop/partials/price_summary.html' with subtotal=service.price shipping_cost=0 total_price=service.price pickup_on_site=True %}
+                    </div>
+
+                    <input type="hidden" name="date" id="selected-date-{{ service.id }}">
+                    <input type="hidden" name="time" id="selected-time-{{ service.id }}">
+
+                    <button type="submit" id="submit-booking-{{ service.id }}" disabled class="w-full py-5 rounded-2xl bg-cultura-green text-white font-display font-black uppercase tracking-widest text-xs shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50 mt-6">
+                        Confirmar Agendamento
+                    </button>
+                </form>
+
+                <script>
+                    (function() {
+                        const serviceId = "{{ service.id }}";
+                        const calendarEl = document.getElementById(`calendar-${serviceId}`);
+                        const slotsContainer = document.getElementById(`slots-container-${serviceId}`);
+                        const slotsGrid = document.getElementById(`slots-grid-${serviceId}`);
+                        const dateInput = document.getElementById(`selected-date-${serviceId}`);
+                        const timeInput = document.getElementById(`selected-time-${serviceId}`);
+                        const submitBtn = document.getElementById(`submit-booking-${serviceId}`);
+
+                        const addressContainer = document.getElementById(`address-container-${serviceId}`);
+                        const paymentContainer = document.getElementById(`payment-container-${serviceId}`);
+                        const allowedWeekdays = {{ service.get_days_list|safe }};
+
+                        function renderCalendar() {
+                            const now = new Date();
+                            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                            const startDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay(); // 0 is Sunday
+                            
+                            const dayNames = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+                            calendarEl.innerHTML = '';
+
+                            dayNames.forEach(name => {
+                                calendarEl.innerHTML += `<div class="text-[9px] font-black text-gray-300 py-2">${name}</div>`;
+                            });
+
+                            for (let i = 0; i < startDay; i++) {
+                                calendarEl.innerHTML += `<div></div>`;
+                            }
+
+                            for (let d = 1; d <= daysInMonth; d++) {
+                                const dateObj = new Date(now.getFullYear(), now.getMonth(), d);
+                                const dateStr = dateObj.toISOString().split('T')[0];
+                                const isPast = dateObj < new Date().setHours(0,0,0,0);
+                                
+                                const jsDay = dateObj.getDay();
+                                const djangoDay = jsDay === 0 ? 6 : jsDay - 1;
+                                const isAllowed = allowedWeekdays.includes(djangoDay);
+                                
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.innerText = d;
+                                
+                                if (isPast || !isAllowed) {
+                                    btn.className = 'calendar-btn calendar-btn-disabled';
+                                } else {
+                                    btn.className = 'calendar-btn calendar-btn-available';
+                                    btn.onclick = () => selectDate(dateStr, btn);
+                                }
+                                
+                                calendarEl.appendChild(btn);
+                            }
+                        }
+
+                        async function selectDate(date, btn) {
+                            calendarEl.querySelectorAll('button').forEach(b => b.classList.remove('calendar-btn-selected'));
+                            btn.classList.add('calendar-btn-selected');
+                            
+                            dateInput.value = date;
+                            timeInput.value = '';
+                            addressContainer.classList.add('hidden');
+                            paymentContainer.classList.add('hidden');
+                            submitBtn.disabled = true;
+
+                            const resp = await fetch(`/loja/available-slots/${serviceId}/?date=${date}`);
+                            const data = await resp.json();
+
+                            slotsGrid.innerHTML = '';
+                            if (data.slots && data.slots.length > 0) {
+                                slotsContainer.classList.remove('hidden');
+                                data.slots.forEach(slot => {
+                                    const sBtn = document.createElement('button');
+                                    sBtn.type = 'button';
+                                    sBtn.innerText = slot.time;
+                                    
+                                    if (slot.available) {
+                                        sBtn.className = 'slot-btn slot-btn-available';
+                                        sBtn.onclick = () => {
+                                            slotsGrid.querySelectorAll('button').forEach(b => b.classList.remove('slot-btn-selected'));
+                                            sBtn.classList.add('slot-btn-selected');
+                                            timeInput.value = slot.time;
+                                            addressContainer.classList.remove('hidden');
+                                            
+                                            // Se houver endereço selecionado, mostra pagamento
+                                            const selectedAddr = document.querySelector(`#booking-form-${serviceId} input[name="address_id"]:checked`);
+                                            if (selectedAddr) {
+                                                paymentContainer.classList.remove('hidden');
+                                                submitBtn.disabled = false;
+                                            }
+                                        };
+                                    } else {
+                                        sBtn.className = 'slot-btn bg-gray-100 text-gray-300 cursor-not-allowed';
+                                    }
+                                    slotsGrid.appendChild(sBtn);
+                                });
+                            } else {
+                                slotsContainer.classList.add('hidden');
+                                alert("Nenhum horário disponível para este dia.");
+                            }
+                        }
+
+                        // Listeners para mudanças de endereço no modal
+                        document.querySelectorAll(`#booking-form-${serviceId} input[name="address_id"]`).forEach(radio => {
+                            radio.addEventListener('change', () => {
+                                if (timeInput.value) {
+                                    paymentContainer.classList.remove('hidden');
+                                    submitBtn.disabled = false;
+                                }
+                            });
+                        });
+
+                        renderCalendar();
+                    })();
+                </script>
+                <style>
+                    .calendar-btn {
+                        height: 2.5rem;
+                        width: 100%;
+                        border-radius: 0.8rem;
+                        font-size: 10px;
+                        font-weight: 700;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 2px solid transparent;
+                    }
+                    .calendar-btn-available {
+                        color: #4b5563;
+                        cursor: pointer;
+                    }
+                    .calendar-btn-available:hover {
+                        background: rgba(85, 107, 47, 0.08);
+                        color: #556b2f;
+                        transform: translateY(-2px);
+                        border-color: rgba(85, 107, 47, 0.1);
+                    }
+                    .calendar-btn-disabled {
+                        background: #f3f4f6 !important;
+                        color: #9ca3af !important;
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                        pointer-events: none;
+                    }
+                    .calendar-btn-selected {
+                        background: #556b2f !important;
+                        color: white !important;
+                        box-shadow: 0 10px 15px -3px rgba(85, 107, 47, 0.4);
+                        transform: scale(1.1) translateY(-2px);
+                        border-color: #556b2f !important;
+                    }
+                    .slot-btn {
+                        padding: 0.85rem;
+                        border-radius: 1.25rem;
+                        font-size: 10px;
+                        font-weight: 800;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        border: 2px solid transparent;
+                        text-align: center;
+                    }
+                    .slot-btn-available {
+                        background: #f3f4f6;
+                        color: #374151;
+                        cursor: pointer;
+                    }
+                    .slot-btn-available:hover {
+                        border-color: #556b2f;
+                        color: #556b2f;
+                        background: white;
+                        transform: translateY(-3px);
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                    }
+                    .slot-btn-selected {
+                        background: #556b2f !important;
+                        color: white !important;
+                        box-shadow: 0 12px 20px -5px rgba(85, 107, 47, 0.4);
+                        transform: scale(1.05) translateY(-3px);
+                        border-color: #556b2f !important;
+                    }
+                </style>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not products and not services and not is_owner %}
+    <div class="bg-white rounded-[3rem] p-16 text-center border-2 border-dashed border-gray-100">
+        <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-[0.3em]">Nenhum produto ou serviço disponível no momento.</p>
+    </div>
+    {% endif %}
+</div>

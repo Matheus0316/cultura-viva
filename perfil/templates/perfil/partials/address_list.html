@@ -1,0 +1,33 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for addr in addresses %}
+    <div class="bg-cultura-sand-light/30 rounded-[2rem] p-6 border border-transparent hover:border-cultura-green/20 transition-all group">
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-cultura-green shadow-sm">
+                    <i class="fa-solid fa-map-location-dot text-xs"></i>
+                </div>
+                {% if addr.is_main %}
+                <span class="text-[8px] font-display font-black uppercase tracking-widest bg-cultura-green text-white px-2 py-1 rounded-md">Principal</span>
+                {% endif %}
+            </div>
+            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button hx-get="{% url 'perfil:address_edit' addr.pk %}" hx-target="#modal-container" class="w-8 h-8 rounded-lg bg-white text-gray-400 hover:text-cultura-green shadow-sm flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                <form method="POST" action="{% url 'perfil:address_delete' addr.pk %}" onsubmit="return confirm('Excluir este endereço?')">
+                    {% csrf_token %}
+                    <button type="submit" class="w-8 h-8 rounded-lg bg-white text-gray-400 hover:text-red-500 shadow-sm flex items-center justify-center transition-all">
+                        <i class="fa-solid fa-trash text-[10px]"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <p class="text-cultura-dark font-display font-bold text-xs mb-1">{{ addr.street }}, {{ addr.number }}</p>
+        <p class="text-gray-400 text-[10px] font-medium uppercase tracking-widest">{{ addr.neighborhood }} — {{ addr.city }}/{{ addr.state }}</p>
+    </div>
+    {% empty %}
+    <div class="md:col-span-2 py-10 text-center border-2 border-dashed border-gray-100 rounded-[2rem]">
+        <p class="text-[10px] font-display font-black text-gray-300 uppercase tracking-widest">Nenhum endereço cadastrado.</p>
+    </div>
+    {% endfor %}
+</div>

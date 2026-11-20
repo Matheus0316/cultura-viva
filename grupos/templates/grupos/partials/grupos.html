@@ -1,0 +1,92 @@
+{% if grupos %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    {% for grupo in grupos %}
+    <article class="group bg-white rounded-[2.5rem] shadow-premium hover:shadow-premium-hover transition-all duration-700 overflow-hidden border border-gray-100 flex flex-col h-full border-b-4 border-b-transparent hover:border-b-cultura-green">
+        <div class="relative h-64 overflow-hidden">
+            <img class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                src="{{ grupo.thumbnail_url }}" alt="{{ grupo.name }}">
+            
+            <!-- Category Badge -->
+            <div class="absolute top-6 right-6">
+                <span class="bg-cultura-green/10 backdrop-blur-md text-cultura-green text-[9px] font-display font-black px-4 py-2 rounded-full uppercase tracking-widest border border-cultura-green/20">
+                    {{ grupo.get_category_display }}
+                </span>
+            </div>
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+
+        <div class="p-10 flex-grow flex flex-col">
+            <h3 class="font-serif italic text-2xl text-cultura-dark mb-4 group-hover:text-cultura-green transition-colors leading-tight">
+                {{ grupo.name }}
+            </h3>
+            <p class="text-gray-500 font-light text-sm leading-relaxed mb-8 line-clamp-3">
+                {{ grupo.description|truncatewords:25 }}
+            </p>
+            
+            <div class="mt-auto pt-8 border-t border-gray-50 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fa-solid fa-users text-xs text-cultura-green/40"></i>
+                    <span class="text-[10px] font-display font-bold uppercase tracking-wider">Iniciativa Ativa</span>
+                </div>
+                <a href="{% url 'grupos:grupo_detail' grupo.id %}" 
+                   class="group/link flex items-center gap-3 text-cultura-dark font-display font-black text-[10px] uppercase tracking-widest hover:text-cultura-green transition-colors">
+                   DETALHES <i class="fa-solid fa-arrow-right-long group-hover/link:translate-x-2 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<!-- Premium Pagination -->
+{% if grupos.has_other_pages %}
+<div class="mt-20 flex justify-center">
+    <nav class="flex items-center gap-2 p-2 bg-white rounded-full shadow-premium border border-gray-100">
+        {% if grupos.has_previous %}
+        <a href="?page={{ grupos.previous_page_number }}&search={{ request.GET.search|urlencode }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+            class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        <div class="px-6 py-2 bg-cultura-sand-light rounded-full">
+            <span class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest">
+                {{ grupos.number }} <span class="text-gray-400 mx-2">/</span> {{ grupos.paginator.num_pages }}
+            </span>
+        </div>
+
+        {% if grupos.has_next %}
+        <a href="?page={{ grupos.next_page_number }}&search={{ request.GET.search|urlencode }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+            class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+
+{% else %}
+<div class="py-32 text-center glass rounded-[4rem] border-2 border-dashed border-gray-100">
+    <div class="w-24 h-24 bg-cultura-sand-light rounded-full flex items-center justify-center mx-auto mb-8">
+        <i class="fa-solid fa-people-group text-4xl text-gray-200"></i>
+    </div>
+
+    <h3 class="font-serif italic text-2xl text-cultura-dark mb-4">Horizonte a Percorrer</h3>
+
+    <p class="text-gray-400 font-light max-w-sm mx-auto mb-10">
+        {% if not request.GET.search %}
+        Nenhuma iniciativa coletiva registrada nesta categoria no momento. Que tal dar o primeiro passo?
+        {% else %}
+        Não encontramos resultados para sua busca. Tente novos termos ou explore por categorias.
+        {% endif %}
+    </p>
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'grupos:grupo_create' %}"
+        class="inline-flex items-center gap-3 px-10 py-5 bg-cultura-dark text-white font-display font-black text-[11px] uppercase tracking-widest rounded-full hover:bg-cultura-green transition-all duration-500 shadow-premium">
+        <i class="fa-solid fa-plus"></i> Iniciar Coletivo
+    </a>
+    {% endif %}
+</div>
+{% endif %}

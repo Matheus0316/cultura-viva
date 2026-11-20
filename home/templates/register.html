@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro do Cidadão - Prefeitura Municipal de Tacima{% endblock %}
+
+
+
+{% block content %}
+
+{% if error %}
+{{ error|json_script:"server-error-data" }}
+{% endif %}
+
+<section class="bg-cultura-sand py-16 md:py-24">
+    <div class="container mx-auto px-6 flex justify-center">
+
+        <div class="w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-8 md:p-12">
+                <div class="text-center mb-8">
+                    <h1 class="font-serif text-3xl md:text-4xl font-bold text-cultura-dark">
+                        Cadastro do Cidadão
+                    </h1>
+                    <p class="text-gray-600 mt-3">
+                        Crie sua identidade digital para acessar os serviços municipais.
+                    </p>
+                </div>
+
+                <form action="{% url 'home:register' %}" method="POST" class="space-y-6" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {{ form }}
+                    <button type="submit"
+                        class="w-full bg-cultura-yellow hover:bg-yellow-400 text-cultura-dark font-bold py-3 px-8 rounded opacity-90 hover:opacity-100 text-lg transition duration-300 transform hover:-translate-y-1 mt-4 shadow">
+                        Criar Conta
+                    </button>
+            </div>
+            </form>
+
+            <div class="text-center mt-8">
+                <p class="text-gray-600">
+                    Já possui cadastro?
+                    <a href="{% url 'home:login' %}"
+                        class="font-bold text-cultura-terracotta hover:text-cultura-dark transition duration-300">
+                        Acesse aqui
+                    </a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    </div>
+</section>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // --- LÓGICA PARA EXIBIR O ERRO DO SERVIDOR (CONTEXT) ---
+        const errorElement = document.getElementById('server-error-data');
+        if (errorElement) {
+            const errorMessage = JSON.parse(errorElement.textContent);
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+        }
+
+        // --- LÓGICA PARA EXIBIR/OCULTAR SENHA ---
+        function setupPasswordToggle(inputId, toggleButtonId, eyeIconId, eyeSlashIconId) {
+            const toggleButton = document.getElementById(toggleButtonId);
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(eyeIconId);
+            const eyeSlashIcon = document.getElementById(eyeSlashIconId);
+
+            toggleButton.addEventListener('click', function () {
+                // Alterna o tipo do input
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // Alterna a visibilidade dos ícones
+                eyeIcon.classList.toggle('hidden');
+                eyeSlashIcon.classList.toggle('hidden');
+            });
+        }
+
+        // Configura para o primeiro campo de senha
+        setupPasswordToggle('password', 'togglePassword', 'eye-icon', 'eye-slash-icon');
+        // Configura para o campo de confirmação de senha
+        setupPasswordToggle('password_confirm', 'togglePasswordConfirm', 'eye-icon-confirm', 'eye-slash-icon-confirm');
+
+
+        // --- LÓGICA PARA VERIFICAR SE AS SENHAS COINCIDEM ---
+        const passwordField = document.getElementById('password');
+        const passwordConfirmField = document.getElementById('password_confirm');
+        const messageElement = document.getElementById('password-match-message');
+        const submitButton = document.querySelector('button[type="submit"]');
+
+        function checkPasswords() {
+            const passValue = passwordField.value;
+            const confirmPassValue = passwordConfirmField.value;
+
+            // Não mostra mensagem se o campo de confirmação estiver vazio
+            if (confirmPassValue === '') {
+                messageElement.textContent = '';
+                passwordConfirmField.classList.remove('border-red-500', 'border-green-500');
+                passwordConfirmField.classList.add('border-gray-300');
+                return;
+            }
+
+            if (passValue === confirmPassValue) {
+                messageElement.textContent = 'As senhas coincidem!';
+                messageElement.classList.remove('text-red-600');
+                messageElement.classList.add('text-green-600');
+                passwordConfirmField.classList.remove('border-red-500', 'border-gray-300');
+                passwordConfirmField.classList.add('border-green-500');
+            } else {
+                messageElement.textContent = 'As senhas não coincidem.';
+                messageElement.classList.remove('text-green-600');
+                messageElement.classList.add('text-red-600');
+                passwordConfirmField.classList.remove('border-green-500', 'border-gray-300');
+                passwordConfirmField.classList.add('border-red-500');
+            }
+        }
+
+        // Adiciona o listener para verificar a cada letra digitada
+        passwordField.addEventListener('input', checkPasswords);
+        passwordConfirmField.addEventListener('input', checkPasswords);
+        submitButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (passwordField.value !== passwordConfirmField.value) {
+
+                alert("As senhas não coincidem!");
+            }
+            else if (passwordField.value.length < 8) {
+                alert("A senha deve ter no mínimo 8 caracteres!");
+            } else {
+                console.log("Validação OK. Formulário pronto para ser enviado.");
+                event.target.closest('form').submit();
+            }
+        })
+
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'emails/base_email.html' %}
+
+{% block content %}
+<h2 style="color: #E07A5F; margin-top: 0;">Nova Publicação em {{ post.grupo.name }}</h2>
+
+<div style="font-size: 16px;">
+    <p>Olá,</p>
+    <p>Uma nova publicação foi adicionada ao grupo que você segue. Veja os detalhes abaixo:</p>
+
+    <div
+        style="border-left: 3px solid #E07A5F; padding-left: 15px; margin: 20px 0; background-color: #f9f9f9; padding: 15px;">
+        <h3 style="margin-top: 0; color: #3D405B;">{{ post.title }}</h3>
+        <p style="font-style: italic; color: #666; margin-bottom: 0;">por {{ post.author.user.username }}</p>
+    </div>
+
+    <p style="margin-top: 20px;">Clique no botão abaixo para ver a publicação completa na plataforma.</p>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="http://localhost:8000{% url 'grupos:grupo_detail' post.grupo.id %}" class="btn">
+        Ver Publicação
+    </a>
+</div>
+
+<div style="font-size: 14px; color: #666;">
+    <p>
+        Atenciosamente,<br>
+        <strong>Equipe Cultura Viva Tacima</strong>
+    </p>
+</div>
+{% endblock %}

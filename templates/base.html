@@ -1,0 +1,403 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Cultura Viva Tacima - Memória e Arte{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cultura-terracotta': {
+                            light: '#E79782',
+                            DEFAULT: '#E07A5F',
+                            dark: '#C65F43',
+                        },
+                        'cultura-sand': {
+                            light: '#FBF9F1',
+                            DEFAULT: '#F4F1DE',
+                            dark: '#E7E2C2',
+                        },
+                        'cultura-green': {
+                            light: '#A1C7B5',
+                            DEFAULT: '#81B29A',
+                            dark: '#61937A',
+                        },
+                        'cultura-yellow': {
+                            light: '#F6DBB0',
+                            DEFAULT: '#F2CC8F',
+                            dark: '#E8B669',
+                        },
+                        'cultura-dark': {
+                            light: '#52567A',
+                            DEFAULT: '#3D405B',
+                            dark: '#2A2C3F',
+                        },
+                        'brand-brown': '#3D405B',
+                        'brand-gold': '#F2CC8F',
+                        'brand-cream': '#F4F1DE',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif': ['Lora', 'serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium': '0 10px 30px -10px rgba(0, 0, 0, 0.1)',
+                        'premium-hover': '0 20px 40px -15px rgba(0, 0, 0, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-dark {
+            background: rgba(61, 64, 91, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #E07A5F;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body class="bg-cultura-sand-light font-sans text-cultura-dark">
+
+    <!-- Top Bar Institucional Modernizado -->
+    <div class="bg-cultura-dark text-cultura-sand-light text-[10px] md:text-xs py-2 px-4 border-b border-white/10 uppercase tracking-[0.2em] font-display font-semibold">
+        <div class="container mx-auto flex justify-between items-center">
+            <span class="hidden md:inline opacity-80">Projeto de Preservação Cultural de Tacima (PB)</span>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-cultura-terracotta transition-colors duration-300">Acessibilidade</a>
+                <a href="#" class="hover:text-cultura-terracotta transition-colors duration-300">Sobre</a>
+                <a href="#" class="hover:text-cultura-terracotta transition-colors duration-300">Contato</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Navbar -->
+    <header class="sticky top-0 z-50 glass shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="{% url 'home:index' %}" class="flex items-center group">
+                <div class="flex flex-col">
+                    <span class="text-cultura-terracotta font-serif italic text-sm leading-none">Projeto</span>
+                    <span class="text-cultura-dark font-display font-extrabold text-2xl md:text-3xl leading-tight tracking-tight group-hover:text-cultura-terracotta transition-colors duration-300">
+                        CULTURA VIVA
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="h-[1px] w-4 bg-cultura-green"></span>
+                        <span class="text-cultura-green font-display font-bold text-[10px] tracking-widest uppercase">Tacima - PB</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden lg:flex items-center space-x-2">
+                <ul class="flex items-center mr-8">
+                    <li><a href="{% url 'home:index' %}" class="nav-link py-2 px-4 font-display font-bold text-[12px] text-cultura-dark/80 hover:text-cultura-terracotta tracking-wider">INÍCIO</a></li>
+                    <li><a href="{% url 'events:event_list' %}" class="nav-link py-2 px-4 font-display font-bold text-[12px] text-cultura-dark/80 hover:text-cultura-terracotta tracking-wider">AGENDA</a></li>
+                    <li><a href="{% url 'grupos:grupo_list' %}?category=PROJETO_SOCIAL" class="nav-link py-2 px-4 font-display font-bold text-[12px] text-cultura-dark/80 hover:text-cultura-terracotta tracking-wider">SOCIAL</a></li>
+                    <li><a href="{% url 'artistas:artista_list' %}" class="nav-link py-2 px-4 font-display font-bold text-[12px] text-cultura-dark/80 hover:text-cultura-terracotta tracking-wider">ARTISTAS</a></li>
+                    <li><a href="{% url 'acervo:acervo_list' %}" class="nav-link py-2 px-4 font-display font-bold text-[12px] text-cultura-dark/80 hover:text-cultura-terracotta tracking-wider">ACERVO</a></li>
+                    
+                    {% if user.is_staff or user.is_superuser %}
+                        <li class="relative group/admin">
+                            <button class="py-2 px-4 font-display font-bold text-[12px] text-cultura-yellow-dark tracking-wider flex items-center gap-1">
+                                ADMIN <i class="fa-solid fa-chevron-down text-[8px]"></i>
+                            </button>
+                            <div class="absolute top-full left-0 w-48 bg-white shadow-premium rounded-xl py-2 opacity-0 invisible group-hover/admin:opacity-100 group-hover/admin:visible transition-all duration-300 transform translate-y-2 group-hover/admin:translate-y-0 border border-gray-100">
+                                <a href="{% url 'perfil:user_list' %}" class="block py-2 px-6 text-[12px] font-bold text-gray-700 hover:bg-cultura-sand-light hover:text-cultura-terracotta">USUÁRIOS</a>
+                                <a href="{% url 'artistas:admin_request_list' %}" class="block py-2 px-6 text-[12px] font-bold text-gray-700 hover:bg-cultura-sand-light hover:text-cultura-terracotta">SOLICITAÇÕES</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="flex items-center gap-4 pl-6 border-l border-gray-200">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'perfil:profile_detail' user.perfil.id %}" class="flex items-center gap-3 bg-cultura-sand-light hover:bg-white px-3 py-1.5 rounded-full transition-all duration-300 border border-transparent hover:border-gray-100">
+                            <span class="font-display font-bold text-[12px] text-cultura-dark">@{{ user.username }}</span>
+                            <img src="{{ user.perfil.avatar }}" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover">
+                        </a>
+                        <a href="{% url 'home:logout' %}" class="text-[11px] font-display font-extrabold text-gray-500 hover:text-red-500 transition-colors duration-300 uppercase tracking-widest">Sair</a>
+                    {% else %}
+                        <a href="{% url 'home:login' %}" class="text-[12px] font-display font-bold text-cultura-dark hover:text-cultura-terracotta transition-colors duration-300">LOG-IN</a>
+                        <a href="{% url 'home:register' %}" class="bg-cultura-terracotta text-white px-6 py-2.5 rounded-full text-[12px] font-display font-extrabold tracking-wider hover:bg-cultura-dark transition-all duration-500 shadow-premium uppercase">Cadastre-se</a>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <!-- Mobile Menu Toggler -->
+            <button id="mobile-menu-button" class="lg:hidden text-cultura-dark hover:text-cultura-terracotta transition-colors focus:outline-none">
+                <i class="fa-solid fa-bars-staggered text-2xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Refined Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] glass-dark transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] lg:hidden">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-8">
+                <span class="text-white font-display font-extrabold text-xs tracking-widest uppercase opacity-50">Explorar Cultura</span>
+                <button id="close-menu-button" class="text-white hover:text-cultura-terracotta transition-transform hover:rotate-90 duration-300">
+                    <i class="fa-solid fa-xmark text-3xl"></i>
+                </button>
+            </div>
+            
+            <nav class="flex-grow flex flex-col justify-center px-8 space-y-6">
+                <a href="{% url 'home:index' %}" class="text-4xl font-serif italic text-white hover:text-cultura-terracotta transition-colors">Início</a>
+                <a href="{% url 'events:event_list' %}" class="text-4xl font-serif italic text-white hover:text-cultura-terracotta transition-colors">Agenda</a>
+                <a href="{% url 'grupos:grupo_list' %}?category=PROJETO_SOCIAL" class="text-4xl font-serif italic text-white hover:text-cultura-terracotta transition-colors">Social</a>
+                <a href="{% url 'artistas:artista_list' %}" class="text-4xl font-serif italic text-white hover:text-cultura-terracotta transition-colors">Artistas</a>
+                <a href="{% url 'acervo:acervo_list' %}" class="text-4xl font-serif italic text-white hover:text-cultura-terracotta transition-colors">Acervo</a>
+                
+                {% if user.is_staff or user.is_superuser %}
+                    <div class="pt-4 border-t border-white/10 space-y-4">
+                        <a href="{% url 'perfil:user_list' %}" class="block text-xl font-display font-bold text-cultura-yellow">Usuários</a>
+                        <a href="{% url 'artistas:admin_request_list' %}" class="block text-xl font-display font-bold text-cultura-yellow">Solicitações</a>
+                    </div>
+                {% endif %}
+            </nav>
+
+            <div class="p-8 pb-12 mt-auto">
+                {% if user.is_authenticated %}
+                    <div class="flex items-center gap-4 mb-8 bg-white/5 p-4 rounded-2xl border border-white/10">
+                        <img src="{{ user.perfil.avatar }}" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-cultura-terracotta object-cover">
+                        <div>
+                            <p class="text-white font-display font-bold">@{{ user.username }}</p>
+                            <a href="{% url 'perfil:profile_detail' user.perfil.id %}" class="text-cultura-sand-light/60 text-xs">Ver perfil</a>
+                        </div>
+                    </div>
+                    <a href="{% url 'home:logout' %}" class="block w-full py-4 bg-white/5 border border-white/10 text-white rounded-full font-display font-bold text-center tracking-widest hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-300 uppercase">Sair da Conta</a>
+                {% else %}
+                    <div class="grid grid-cols-1 gap-4">
+                        <a href="{% url 'home:login' %}" class="py-4 border border-white/20 text-white rounded-full font-display font-bold text-center hover:bg-white hover:text-cultura-dark transition-all duration-300">LOG-IN</a>
+                        <a href="{% url 'home:register' %}" class="py-4 bg-cultura-terracotta text-white rounded-full font-display font-bold text-center shadow-lg uppercase tracking-widest">Cadastrar Agora</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <main class="relative">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modernized Footer -->
+    <footer class="bg-cultura-dark text-white pt-20 pb-10 overflow-hidden relative">
+        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] bg-cultura-terracotta/5 rounded-full blur-[100px] -z-0"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+                <!-- Brand Info -->
+                <div class="lg:col-span-4">
+                    <div class="flex flex-col mb-6">
+                        <span class="font-serif italic text-xl leading-none text-cultura-terracotta">Projeto</span>
+                        <span class="font-display font-black text-3xl leading-none uppercase text-white tracking-tighter">CULTURA VIVA</span>
+                        <span class="text-cultura-green font-display font-bold text-xs tracking-widest uppercase mt-1">Tacima - PB</span>
+                    </div>
+                    <p class="text-cultura-sand-light/60 font-light leading-relaxed mb-8 max-w-sm">
+                        Um ecossistema digital dedicado à salvaguarda da memória, promoção das artes e fortalecimento da identidade cultural do povo tacimense.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-cultura-terracotta transition-all duration-300 group">
+                            <i class="fa-brands fa-instagram text-lg group-hover:scale-110"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-cultura-terracotta transition-all duration-300 group">
+                            <i class="fa-brands fa-facebook-f text-lg group-hover:scale-110"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-cultura-terracotta transition-all duration-300 group">
+                            <i class="fa-brands fa-youtube text-lg group-hover:scale-110"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation Groups -->
+                <div class="lg:col-span-2 lg:ml-auto">
+                    <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] mb-6 text-cultura-yellow">Explorar</h4>
+                    <ul class="space-y-4">
+                        <li><a href="{% url 'home:index' %}" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Início</a></li>
+                        <li><a href="{% url 'events:event_list' %}" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Agenda Cultural</a></li>
+                        <li><a href="{% url 'artistas:artista_list' %}" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Artistas</a></li>
+                    </ul>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] mb-6 text-cultura-yellow">Recursos</h4>
+                    <ul class="space-y-4">
+                        <li><a href="{% url 'acervo:acervo_list' %}" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Acervo Digital</a></li>
+                        <li><a href="{% url 'grupos:grupo_list' %}" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Projetos Sociais</a></li>
+                        <li><a href="#" class="text-sm text-cultura-sand-light/60 hover:text-white transition-colors">Documentação</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact/Support -->
+                <div class="lg:col-span-4 bg-white/5 p-8 rounded-3xl border border-white/10">
+                    <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] mb-6 text-cultura-terracotta">Fale Conosco</h4>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-lg bg-cultura-terracotta/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-location-dot text-cultura-terracotta"></i>
+                            </div>
+                            <p class="text-xs text-cultura-sand-light/80 leading-relaxed font-medium">Casa da Cultura, Centro Histórico de Tacima - PB</p>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-lg bg-cultura-green/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-envelope text-cultura-green"></i>
+                            </div>
+                            <p class="text-xs text-cultura-sand-light/80 font-medium">cultura@tacima.pb.gov.br</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-white/30">
+                    &copy; {% now "Y" %} Cultura Viva Tacima. Todos os direitos reservados.
+                </p>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-white/20">Desenvolvido com</span>
+                    <i class="fa-solid fa-heart text-red-500/50 text-xs"></i>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-white/20">pela comunidade</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications Container Redesigned -->
+    <div id="notification-container" class="fixed top-24 right-5 z-[70] space-y-4 w-full max-w-[320px]">
+        {% if messages %}
+        {% for message in messages %}
+        <div id="toast-{{ forloop.counter }}"
+            class="flex items-center w-full p-4 glass shadow-premium rounded-2xl border-l-[6px] {% if 'success' in message.tags %}border-cultura-green{% elif 'error' in message.tags %}border-red-500{% else %}border-cultura-yellow{% endif %} transition-all duration-500 transform translate-x-10 opacity-0"
+            role="alert">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                {% if 'success' in message.tags %}bg-cultura-green/10 text-cultura-green
+                {% elif 'error' in message.tags %}bg-red-500/10 text-red-500
+                {% else %}bg-cultura-yellow/10 text-cultura-yellow{% endif %}">
+                {% if 'success' in message.tags %}<i class="fa-solid fa-check"></i>
+                {% elif 'error' in message.tags %}<i class="fa-solid fa-circle-exclamation"></i>
+                {% else %}<i class="fa-solid fa-info"></i>{% endif %}
+            </div>
+            <div class="ml-4 text-xs font-bold text-cultura-dark uppercase tracking-wide">{{ message.message }}</div>
+            <button type="button" class="ml-auto text-gray-400 hover:text-cultura-dark transition-colors" data-dismiss-target="#toast-{{ forloop.counter }}">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const closeButton = document.getElementById('close-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', () => {
+                    mobileMenu.classList.remove('translate-x-full');
+                    document.body.classList.add('overflow-hidden');
+                });
+            }
+
+            if (closeButton && mobileMenu) {
+                closeButton.addEventListener('click', () => {
+                    mobileMenu.classList.add('translate-x-full');
+                    document.body.classList.remove('overflow-hidden');
+                });
+            }
+
+            // Close menu on link click
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('translate-x-full');
+                    document.body.classList.remove('overflow-hidden');
+                });
+            });
+
+            // Handle Toast Animation
+            const toasts = document.querySelectorAll('[id^="toast-"]');
+            toasts.forEach((toast, index) => {
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-10', 'opacity-0');
+                }, 100 * (index + 1));
+
+                const dismissButton = toast.querySelector('[data-dismiss-target]');
+                const hideToast = () => {
+                    toast.classList.add('translate-x-10', 'opacity-0');
+                    setTimeout(() => {
+                        if (toast.parentNode) toast.parentNode.removeChild(toast);
+                    }, 500);
+                };
+                if (dismissButton) dismissButton.addEventListener('click', hideToast);
+                setTimeout(hideToast, 6000);
+            });
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    {% endblock %}
+    <!-- Global Modal Container for HTMX -->
+    <div id="modal-container"></div>
+
+</body>
+
+</html>

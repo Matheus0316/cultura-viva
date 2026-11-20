@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastrar Nova Iniciativa - Cultura Viva Tacima{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light pt-12 pb-24 min-h-screen">
+    <div class="container mx-auto px-6 max-w-3xl">
+        
+        <!-- Header -->
+        <div class="mb-12" data-aos="fade-right">
+            <div class="inline-flex items-center gap-3 mb-4">
+                <span class="h-[2px] w-12 bg-cultura-green"></span>
+                <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Ecos Coletivos</span>
+            </div>
+            <h1 class="font-serif italic text-4xl md:text-6xl text-cultura-dark">Nova <br> <span class="not-italic font-display font-black text-cultura-green/20">Iniciativa</span></h1>
+        </div>
+
+        <!-- Glassmobile Form Container -->
+        <div class="bg-white/40 backdrop-blur-xl rounded-[3rem] border border-white shadow-2xl p-8 md:p-12" data-aos="fade-up">
+            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Name Field -->
+                <div class="space-y-2">
+                    <label class="font-display font-black text-[10px] uppercase tracking-widest text-cultura-dark/60 ml-4">Nome do Projeto/Grupo</label>
+                    <input type="text" name="name" required
+                        class="w-full px-8 py-5 bg-white/60 border border-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-cultura-green transition-all"
+                        placeholder="Ex: Grupo de Teatro Sementes do Amanhã">
+                </div>
+
+                <!-- Category Field -->
+                <div class="space-y-2">
+                    <label class="font-display font-black text-[10px] uppercase tracking-widest text-cultura-dark/60 ml-4">Tipo de Iniciativa</label>
+                    {{ form.category }}
+                </div>
+
+                <!-- Description Field -->
+                <div class="space-y-2">
+                    <label class="font-display font-black text-[10px] uppercase tracking-widest text-cultura-dark/60 ml-4">Nossa História / Objetivo</label>
+                    <textarea name="description" required rows="5"
+                        class="w-full px-8 py-5 bg-white/60 border border-white rounded-3xl focus:outline-none focus:ring-2 focus:ring-cultura-green transition-all resize-none"
+                        placeholder="Conte um pouco sobre como surgiu o grupo e quais suas principais atividades..."></textarea>
+                </div>
+
+                <!-- Thumbnail Field -->
+                <div class="space-y-2">
+                    <label class="font-display font-black text-[10px] uppercase tracking-widest text-cultura-dark/60 ml-4">Capa do Projeto (Imagem)</label>
+                    <div class="relative group">
+                        <input type="file" name="thumbnail" accept="image/*"
+                            class="w-full px-8 py-5 bg-cultura-sand-light/40 border-2 border-dashed border-gray-200 rounded-3xl cursor-pointer file:hidden text-gray-500 hover:border-cultura-green transition-all">
+                        <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="p-6 bg-cultura-sand/30 rounded-2xl border border-cultura-sand">
+                    <p class="text-[11px] text-cultura-dark/60 leading-relaxed italic">
+                        <i class="fa-solid fa-circle-info mr-2 text-cultura-green"></i>
+                        Ao cadastrar esta iniciativa, você se torna o responsável pela atualização do perfil e publicações. Outros membros poderão ser adicionados posteriormente.
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full flex items-center justify-center gap-3 px-10 py-6 bg-cultura-dark text-white font-display font-black text-xs uppercase tracking-widest rounded-full hover:bg-cultura-green transition-all duration-500 shadow-premium hover:shadow-premium-hover hover:-translate-y-1">
+                        Publicar Iniciativa
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                    <a href="{% url 'grupos:grupo_list' %}" class="block text-center mt-6 text-[10px] font-display font-bold text-gray-400 uppercase tracking-widest hover:text-cultura-terracotta transition-colors">
+                        Cancelar e Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurar Agenda - {{ service.name }}{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light min-h-screen py-24">
+    <div class="container mx-auto px-6">
+        <div class="max-w-4xl mx-auto glass rounded-[4rem] p-12 md:p-20 border-white shadow-premium">
+            <div class="mb-12">
+                <div class="inline-flex items-center gap-3 mb-4">
+                    <span class="h-[2px] w-8 bg-cultura-green"></span>
+                    <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Configuração</span>
+                </div>
+                <h1 class="font-serif italic text-4xl md:text-6xl text-cultura-dark">Configurar <br> <span class="not-italic font-display font-black text-cultura-green/20">Agenda</span></h1>
+                <p class="text-gray-400 mt-6 font-light uppercase tracking-widest text-xs">{{ service.name }}</p>
+            </div>
+
+            <!-- Add Availability Form -->
+            <div class="bg-white/50 p-10 rounded-[3rem] border border-white mb-16">
+                <h3 class="font-serif italic text-2xl text-cultura-dark mb-8">Adicionar Novo Intervalo</h3>
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-[10px] font-display font-black uppercase tracking-widest text-gray-400 mb-2">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <div class="md:col-span-3">
+                        <button type="submit" class="w-full py-5 rounded-2xl bg-cultura-green text-white font-display font-black uppercase tracking-widest text-xs shadow-lg hover:bg-cultura-dark transition-all">
+                            Adicionar à Agenda
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- List Existing -->
+            <div class="space-y-6">
+                <h3 class="font-serif italic text-2xl text-cultura-dark mb-8">Horários Cadastrados</h3>
+                {% for avail in availabilities %}
+                <div class="flex items-center justify-between p-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="w-12 h-12 bg-cultura-green/10 rounded-2xl flex items-center justify-center text-cultura-green font-black text-xs">
+                            {{ avail.get_day_of_week_display|slice:":1" }}
+                        </div>
+                        <div>
+                            <p class="text-xs font-display font-black uppercase tracking-widest text-cultura-dark">{{ avail.get_day_of_week_display }}</p>
+                            <p class="text-[10px] font-bold text-gray-400">{{ avail.start_time }} até {{ avail.end_time }}</p>
+                        </div>
+                    </div>
+                    <form action="{% url 'shop:availability_delete' avail.pk %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="w-12 h-12 rounded-2xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </form>
+                </div>
+                {% empty %}
+                <div class="p-16 text-center border-2 border-dashed border-gray-100 rounded-[3rem]">
+                    <p class="text-gray-400 font-display font-black text-[10px] uppercase tracking-widest">Nenhum horário configurado ainda.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-16 pt-8 border-t border-white/20">
+                <a href="{% url 'home:index' %}" class="text-[10px] font-display font-black uppercase tracking-[0.3em] text-gray-400 hover:text-cultura-dark transition-all">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao Perfil
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .glass-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        border: 2px solid white;
+        border-radius: 1.5rem;
+        padding: 1rem 1.5rem;
+        font-family: 'Inter', sans-serif;
+        color: #1a1a1a;
+        transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+        background: white;
+        border-color: #556b2f;
+        outline: none;
+    }
+</style>
+{% endblock %}

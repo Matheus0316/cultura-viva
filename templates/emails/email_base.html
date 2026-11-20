@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block email_title %}{% endblock %}</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #FDF6E8; font-family: 'Montserrat', sans-serif; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; }
+        .header { background-color: #5D2B1C; color: #FDF6E8; padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-family: 'Merriweather', serif; }
+        .content { padding: 30px; color: #5D2B1C; line-height: 1.6; }
+        .content h2 { font-family: 'Merriweather', serif; color: #5D2B1C; }
+        .button { display: inline-block; background-color: #F2A341; color: #5D2B1C; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; }
+        .footer { background-color: #f2f2f2; color: #888888; padding: 20px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td style="padding: 20px 0;">
+                <table role="presentation" class="container" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td class="header">
+                            <h1>Paróquia São Francisco de Assis</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            {% block email_content %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer">
+                            <p>&copy; {% now "Y" %} Paróquia São Francisco de Assis. Todos os direitos reservados.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

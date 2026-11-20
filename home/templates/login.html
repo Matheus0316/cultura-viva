@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Entrar - Prefeitura Municipal de Tacima{% endblock %}
+
+{% block content %}
+<div class="bg-cultura-sand min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-serif font-extrabold text-cultura-dark">
+                Acesse o Portal do Cidadão
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Ou
+                <a href="{% url 'home:register' %}" class="font-medium text-cultura-terracotta hover:text-cultura-dark">
+                    crie sua conta aqui
+                </a>
+            </p>
+        </div>
+
+        <form class="mt-8 space-y-6" method="POST" action="{% url 'home:login' %}">
+            {% csrf_token %}
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="username" class="sr-only">Usuário</label>
+                    <input id="username" name="username" type="text" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-cultura-yellow focus:border-cultura-yellow focus:z-10 sm:text-sm"
+                        placeholder="Nome de usuário">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Senha</label>
+                    <div class="relative">
+                        <input id="password" name="password" type="password" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-cultura-dark focus:border-cultura-dark focus:z-10 sm:text-sm"
+                            placeholder="Senha">
+                        <button type="button" id="togglePassword"
+                            class="absolute inset-y-0 right-0 z-20 px-4 flex items-center text-gray-500 hover:text-cultura-dark">
+                            <i id="eye-icon" class="fa-solid fa-eye"></i>
+                            <i id="eye-slash-icon" class="fa-solid fa-eye-slash hidden"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ error }}</span>
+            </div>
+            {% endif %}
+
+            {% if success_message %}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ success_message }}</span>
+            </div>
+            {% endif %}
+
+            <div class="flex items-center justify-between">
+                <div class="text-sm">
+                    <a href="#" id="forgotPasswordLink"
+                        class="font-medium text-cultura-dark hover:text-cultura-terracotta">
+                        Esqueceu sua senha?
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cultura-terracotta hover:bg-cultura-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cultura-terracotta">
+                    Entrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="forgotPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative">
+        <button id="closeModalButton" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <h2 class="text-2xl font-serif font-bold text-cultura-dark text-center mb-4">Redefinir Senha</h2>
+        <p class="text-center text-gray-600 mb-6">Digite seu e-mail e enviaremos um link para você criar uma nova senha.
+        </p>
+
+        <form method="POST" action="{% url 'home:send_change_password_email' %}">
+            {% csrf_token %}
+            <div>
+                <label for="email_modal" class="block text-sm font-bold text-cultura-dark mb-2">E-mail</label>
+                <input id="email_modal" name="email" type="email" required
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cultura-yellow focus:border-transparent"
+                    placeholder="seu.email@exemplo.com">
+            </div>
+            <div class="mt-6">
+                <button type="submit"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-cultura-dark hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cultura-yellow">
+                    Enviar Link de Redefinição
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Script para o botão de exibir/ocultar senha (já existente)
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeSlashIcon = document.getElementById('eye-slash-icon');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.add('hidden');
+            eyeSlashIcon.classList.remove('hidden');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('hidden');
+            eyeSlashIcon.classList.add('hidden');
+        }
+    });
+
+    // --- PASSO 3: JavaScript para controlar o Modal ---
+
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    // Função para abrir o modal
+    forgotPasswordLink.addEventListener('click', function (event) {
+        event.preventDefault(); // Impede que o link navegue
+        forgotPasswordModal.classList.remove('hidden');
+    });
+
+    // Função para fechar o modal pelo botão 'X'
+    closeModalButton.addEventListener('click', function () {
+        forgotPasswordModal.classList.add('hidden');
+    });
+
+    // Função para fechar o modal clicando fora dele (no overlay)
+    forgotPasswordModal.addEventListener('click', function (event) {
+        if (event.target === forgotPasswordModal) {
+            forgotPasswordModal.classList.add('hidden');
+        }
+    });
+
+    // Função para fechar o modal com a tecla 'Escape'
+    document.addEventListener('keydown', function (event) {
+        if (event.key === "Escape") {
+            forgotPasswordModal.classList.add('hidden');
+        }
+    });
+</script>
+
+{% endblock %}

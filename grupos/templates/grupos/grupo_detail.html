@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ grupo.name }} - Ecossistema Cultural{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light min-h-screen pb-24">
+    <!-- Immersive Hero Section -->
+    <div class="relative">
+        <div class="h-80 md:h-[35rem] bg-cultura-dark relative overflow-hidden">
+            <!-- Dynamic Background -->
+            <img src="{{ grupo.thumbnail_url }}" class="w-full h-full object-cover opacity-40 blur-sm scale-110" alt="Background">
+            <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark via-cultura-dark/60 to-transparent"></div>
+            
+            <!-- Animated Accents -->
+            <div class="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-cultura-green/10 rounded-full blur-[120px] animate-pulse"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative -mt-48 md:-mt-64">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row items-center md:items-end gap-10 md:gap-16 mb-12">
+                    <!-- Identity Image -->
+                    <div class="relative group" data-aos="zoom-in">
+                        <div class="absolute inset-0 bg-cultura-green/20 rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
+                        <div class="relative w-56 h-56 md:w-80 md:h-80 rounded-[3.5rem] border-[10px] border-white shadow-premium overflow-hidden z-10 transition-transform duration-1000 hover:scale-[1.03]">
+                            <img src="{{ grupo.thumbnail_url }}" alt="{{ grupo.name }}" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+
+                    <!-- Header Content -->
+                    <div class="flex-grow pb-4 text-center md:text-left" data-aos="fade-up" data-aos-delay="200">
+                        <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-6">
+                            <span class="w-2 h-2 bg-cultura-green rounded-full animate-ping"></span>
+                            <span class="text-white font-display font-black text-[9px] tracking-[0.4em] uppercase">{{ grupo.get_category_display }}</span>
+                        </div>
+                        <h1 class="font-serif italic text-5xl md:text-8xl text-white mb-6 leading-tight drop-shadow-2xl">
+                            {{ grupo.name }}
+                        </h1>
+                        
+                        <!-- Statistics & Follow -->
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-10">
+                            <div class="flex items-center gap-10">
+                                <div class="text-center md:text-left group/stat">
+                                    <span class="block text-white font-display font-black text-3xl group-hover:text-cultura-green transition-colors">{{ grupo.seguidores.count }}</span>
+                                    <span class="text-white/40 font-display font-bold text-[9px] uppercase tracking-[0.2em]">Seguidores</span>
+                                </div>
+                                <div class="h-10 w-px bg-white/10"></div>
+                                <div class="text-center md:text-left group/stat">
+                                    <span class="block text-white font-display font-black text-3xl group-hover:text-cultura-green transition-colors">{{ grupo.membros.count }}</span>
+                                    <span class="text-white/40 font-display font-bold text-[9px] uppercase tracking-[0.2em]">Ativistas</span>
+                                </div>
+                            </div>
+
+                            {% if user.is_authenticated and user != grupo.updated_by %}
+                            <div class="w-full md:w-auto">
+                                {% if is_following %}
+                                <a href="{% url 'perfil:deixar_De_seguir_grupo' grupo.id %}"
+                                    class="block w-full md:w-auto text-center bg-white/10 backdrop-blur-md text-white border border-white/20 font-display font-black text-[10px] uppercase tracking-widest py-5 px-10 rounded-full hover:bg-red-500/20 hover:border-red-500/40 transition-all duration-500 shadow-xl">
+                                    DESINSTALAR DA REDE
+                                </a>
+                                {% else %}
+                                <a href="{% url 'perfil:seguir_grupo' grupo.id %}"
+                                    class="block w-full md:w-auto text-center bg-cultura-green text-white font-display font-black text-[10px] uppercase tracking-widest py-5 px-12 rounded-full shadow-premium hover:bg-cultura-dark transition-all duration-500 hover:-translate-y-1">
+                                    SINTONIZAR NESTE GRUPO
+                                </a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="container mx-auto px-6 mb-12" data-aos="fade-up">
+        <div class="max-w-6xl mx-auto flex justify-center border-b border-gray-100">
+            <div class="flex gap-8 md:gap-16">
+                <button onclick="switchTab('feed')" id="tab-feed" class="pb-6 text-[10px] md:text-[11px] font-display font-black uppercase tracking-[0.3em] transition-all border-b-2 border-cultura-green text-cultura-dark relative group">
+                    Feed do Coletivo
+                    <span class="absolute top-0 -right-2 w-2 h-2 bg-cultura-green rounded-full animate-pulse"></span>
+                </button>
+                <button onclick="switchTab('shop')" id="tab-shop" class="pb-6 text-[10px] md:text-[11px] font-display font-black uppercase tracking-[0.3em] transition-all border-b-2 border-transparent text-gray-300 hover:text-cultura-dark">
+                    Loja & Serviços
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="container mx-auto px-6 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            
+            <!-- Feed / Shop Container -->
+            <div class="lg:col-span-8">
+                
+                <!-- FEED TAB -->
+                <div id="section-feed" class="space-y-12 transition-all duration-500">
+                    <!-- Composer Trigger -->
+                    {% if is_member or user.is_superuser %}
+                    <div class="bg-white p-6 md:p-8 rounded-[3rem] shadow-premium mb-12 border border-gray-50 flex flex-col md:flex-row items-center gap-6" data-aos="fade-up">
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <img src="{{ request.user.perfil.avatar }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm ring-4 ring-cultura-sand">
+                        </div>
+                        
+                        <div class="flex-grow flex flex-col sm:flex-row gap-4 w-full">
+                            <a href="{% url 'post:post_create' grupo.id %}"
+                                class="flex-grow h-14 bg-cultura-sand-light rounded-2xl text-gray-500 font-display font-bold text-[10px] uppercase tracking-widest flex items-center justify-center px-8 hover:bg-cultura-green hover:text-white transition-all shadow-sm group">
+                                <i class="fa-solid fa-feather-pointed mr-3 group-hover:rotate-12 transition-transform text-lg"></i>
+                                LANÇAR MANIFESTO
+                            </a>
+                            
+                            {% if is_leader or user.is_superuser %}
+                            <a href="{% url 'events:event_create' %}?grupo={{ grupo.id }}"
+                                class="h-14 bg-cultura-dark rounded-2xl text-white font-display font-black text-[10px] uppercase tracking-widest flex items-center justify-center px-8 hover:bg-cultura-terracotta transition-all shadow-premium hover:-translate-y-1">
+                                <i class="fa-solid fa-calendar-plus mr-3 text-lg"></i>
+                                Evento
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Group Events (Newly Added) -->
+                    {% if events %}
+                    <div class="mb-16" data-aos="fade-up">
+                        <div class="inline-flex items-center gap-3 mb-8">
+                            <span class="h-[2px] w-8 bg-cultura-green"></span>
+                            <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Agenda do Coletivo</span>
+                        </div>
+                        <div class="space-y-6">
+                            {% for event in events %}
+                            <a href="{% url 'events:event_detail' event.id %}" class="group flex items-center gap-6 bg-white p-6 rounded-[2.5rem] border border-gray-100 hover:shadow-premium transition-all">
+                                <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
+                                    <img src="{{ event.icon_url }}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-[9px] font-display font-black text-cultura-terracotta uppercase tracking-widest mb-1">{{ event.date|date:"d M, H:i" }}</p>
+                                    <h4 class="font-serif italic text-xl text-cultura-dark group-hover:text-cultura-green transition-colors">{{ event.title }}</h4>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-200 group-hover:text-cultura-green transition-colors mr-4"></i>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Posts List -->
+                    <div class="space-y-12">
+                        <div class="inline-flex items-center gap-3 mb-4">
+                            <span class="h-[2px] w-8 bg-cultura-terracotta"></span>
+                            <span class="text-cultura-terracotta font-display font-black text-[10px] tracking-[0.3em] uppercase">Mural de Memórias</span>
+                        </div>
+                        {% for post in posts %}
+                        <article class="group bg-white rounded-[3rem] shadow-sm hover:shadow-premium transition-all duration-700 overflow-hidden border border-gray-50 relative" data-aos="fade-up">
+                            <!-- Management Controls -->
+                            {% if request.user.perfil == post.author or is_leader %}
+                            <div class="absolute top-6 right-6 z-20">
+                                <div class="relative dropdown-container">
+                                    <button class="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full shadow-lg border border-gray-100 text-gray-400 hover:text-cultura-dark transition-all dropdown-toggle">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <div class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible scale-95 transition-all duration-300 origin-top-right dropdown-menu">
+                                        <div class="p-2">
+                                            <a href="{% url 'post:edit_post' post.id %}" class="flex items-center gap-3 px-4 py-3 text-[10px] font-display font-black uppercase tracking-widest text-gray-600 hover:bg-cultura-sand-light rounded-xl transition-colors edit-post-btn">
+                                                <i class="fa-solid fa-pen-to-square text-xs"></i> Lapidar
+                                            </a>
+                                            <a href="{% url 'post:post_delete' post.id %}" class="flex items-center gap-3 px-4 py-3 text-[10px] font-display font-black uppercase tracking-widest text-red-500 hover:bg-red-50 rounded-xl transition-colors delete-post-btn">
+                                                <i class="fa-solid fa-trash-can text-xs"></i> Remover
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <a href="{% url 'post:post_detail' post.id %}">
+                                <div class="relative h-80 overflow-hidden">
+                                    <img src="{{ post.thumbnail_url }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark/40 via-transparent to-transparent"></div>
+                                </div>
+                                
+                                <div class="p-10">
+                                    <div class="flex items-center gap-4 mb-6">
+                                        <img src="{{ post.author.avatar }}" class="w-10 h-10 rounded-xl object-cover ring-4 ring-cultura-sand">
+                                        <div>
+                                            <p class="font-display font-black text-[9px] uppercase tracking-widest text-cultura-dark">{{ post.author.user.username }}</p>
+                                            <p class="text-[8px] text-gray-400 uppercase tracking-widest">{{ post.created_at|date:"d M, H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    <h3 class="font-serif italic text-2xl text-cultura-dark mb-6 group-hover:text-cultura-green transition-colors leading-tight line-clamp-2">
+                                        {{ post.title }}
+                                    </h3>
+                                    <div class="flex items-center justify-between pt-6 border-t border-gray-50">
+                                        <div class="flex gap-6">
+                                            <div class="flex items-center gap-2 text-gray-400">
+                                                <i class="fa-regular fa-comment text-sm"></i>
+                                                <span class="text-[10px] font-display font-bold">{{ post.comments.count }}</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[9px] font-display font-black uppercase tracking-[0.3em] text-cultura-green">Ver mais <i class="fa-solid fa-arrow-right-long ml-2"></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                        {% empty %}
+                        <div class="py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100" data-aos="fade-up">
+                            <p class="text-gray-400 font-display font-bold text-[10px] uppercase tracking-[0.3em]">Nenhuma publicação ainda.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- SHOP TAB -->
+                <div id="section-shop" class="hidden transition-all duration-500 pb-20">
+                    {% include 'shop/partials/shop_section.html' with products=products services=services is_owner=is_leader seller_type='grupo' seller_id=grupo.id %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="lg:col-span-4 space-y-12">
+                <!-- Group Info Block -->
+                <div class="bg-white rounded-[3rem] p-10 shadow-premium border border-gray-50 sticky top-28" data-aos="fade-left">
+                    {% if is_leader or user.is_superuser %}
+                    <div class="mb-10 p-6 bg-cultura-sand-light rounded-[2rem] border border-cultura-green/10">
+                        <h4 class="font-display font-black text-[10px] text-cultura-green uppercase tracking-[0.4em] mb-6">Controle Criativo</h4>
+                        <div class="space-y-4">
+                            <a href="{% url 'perfil:profile_list' grupo.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-users-gear text-sm"></i> Curadoria de Membros
+                            </a>
+                            <a href="{% url 'grupos:grupo_edit' grupo.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-sliders text-sm"></i> Ajustar Identidade
+                            </a>
+                            <button hx-get="{% url 'grupos:grupo_address_edit' grupo.id %}" 
+                                    hx-target="#modal-container" 
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-location-dot text-sm"></i> Sede / Localização
+                            </button>
+                            <button hx-get="{% url 'grupos:grupo_delivery_edit' grupo.id %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-truck-fast text-sm"></i> Configurar Entrega
+                            </button>
+                            <a href="{% url 'shop:service_settings' 'grupo' grupo.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-calendar-check text-sm"></i> Agenda & Disponibilidade
+                            </a>
+                            <a href="{% url 'shop:dashboard' 'grupo' grupo.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors">
+                                <i class="fa-solid fa-chart-line text-sm"></i> Painel de Vendas
+                            </a>
+                            <button hx-get="{% url 'banking:bank_account_form' 'grupo' grupo.id %}" 
+                                    hx-target="#modal-container"
+                                    class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-cultura-dark hover:text-cultura-green transition-colors w-full text-left">
+                                <i class="fa-solid fa-piggy-bank text-sm"></i> Dados Bancários
+                            </button>
+                            {% if is_leader or user.is_superuser %}
+                            <button id="delete-grupo-trigger-btn" data-url="{% url 'grupos:grupo_delete' grupo.id %}" class="flex items-center gap-4 text-xs font-display font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors">
+                                <i class="fa-regular fa-trash-can text-sm"></i> Dissolver Grupo
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-12">
+                        <h3 class="font-serif italic text-2xl text-cultura-dark mb-6">Nosso Manifesto</h3>
+                        <p class="text-gray-500 font-light text-sm leading-relaxed mb-6">{{ grupo.description }}</p>
+                        <div class="flex items-center gap-4 p-4 bg-cultura-sand-light rounded-2xl">
+                            <div class="w-10 h-10 rounded-full bg-cultura-green flex items-center justify-center text-white">
+                                <i class="fa-solid fa-crown text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[8px] font-display font-black uppercase tracking-widest text-gray-400">Liderança</p>
+                                <p class="text-[11px] font-display font-black uppercase tracking-widest text-cultura-dark">
+                                    {% with lideres=grupo.get_lideres %}
+                                        {{ lideres|join:", "|default:"Conselho Coletivo" }}
+                                    {% endwith %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-12">
+                        <h3 class="font-serif italic text-2xl text-cultura-dark mb-8">Articulação Ativa</h3>
+                        <div class="grid grid-cols-4 gap-4">
+                            {% for membro in grupo.membros.all|slice:":12" %}
+                            <a href="{% url 'perfil:profile_detail' membro.perfil.id %}" class="relative group/membro" title="{{ membro.perfil.user.username }}">
+                                <img src="{{ membro.perfil.avatar }}" class="w-full aspect-square rounded-2xl object-cover shadow-sm group-hover/membro:ring-4 ring-cultura-green/30 transition-all">
+                                <div class="absolute inset-0 bg-cultura-dark/40 rounded-2xl opacity-0 group-hover/membro:opacity-100 transition-opacity flex items-center justify-center">
+                                    <i class="fa-solid fa-eye text-white text-[10px]"></i>
+                                </div>
+                            </a>
+                            {% endfor %}
+                            {% if grupo.membros.count > 12 %}
+                            <div class="aspect-square bg-cultura-sand-light rounded-2xl flex items-center justify-center text-gray-400">
+                                <span class="text-[10px] font-display font-black">+{{ grupo.membros.count|add:"-12" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Redesigned Modals -->
+    <div id="edit-post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-4xl rounded-[4rem] shadow-2xl overflow-hidden relative" data-aos="zoom-in">
+            <button class="absolute top-10 right-10 w-12 h-12 bg-cultura-sand-light rounded-full text-gray-400 hover:text-cultura-dark transition cancel-edit-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-16">
+                <h2 class="font-serif italic text-4xl text-cultura-dark mb-10">Lapidar Memória</h2>
+                <div id="edit-form-container" class="max-h-[60vh] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-post-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-12 text-center" data-aos="zoom-in">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fa-solid fa-trash-can text-3xl"></i>
+            </div>
+            <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Confirmar Remoção?</h3>
+            <p class="text-gray-400 font-light mb-10">Esta ação tornará esta memória inacessível no acervo coletivo permanentemente.</p>
+            <div class="flex gap-4">
+                <button class="flex-grow py-5 rounded-full bg-cultura-sand-light text-gray-500 font-display font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition cancel-delete-btn">Cancelar</button>
+                <a href="#" id="confirm-delete-btn" class="flex-grow py-5 rounded-full bg-red-500 text-white font-display font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition shadow-lg shadow-red-200">Confirmar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Group Modal -->
+    <div id="delete-grupo-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-12 text-center" data-aos="zoom-in">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fa-solid fa-warning text-3xl"></i>
+            </div>
+            <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Dissolver Coletivo?</h3>
+            <p class="text-gray-400 font-light mb-4">Ação irreversível para o grupo <strong class="text-cultura-dark">"{{ grupo.name }}"</strong>.</p>
+            <p class="text-[9px] font-display font-black text-red-400 uppercase tracking-widest mb-10">Todas as memórias articulatadas serão perdidas.</p>
+            <div class="flex gap-4">
+                <button class="flex-grow py-5 rounded-full bg-cultura-sand-light text-gray-500 font-display font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition cancel-delete-grupo-btn">Desistir</button>
+                <button id="confirm-delete-grupo-btn" class="flex-grow py-5 rounded-full bg-red-500 text-white font-display font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition shadow-lg shadow-red-200">Dissolver</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    function switchTab(tab) {
+        const feedBtn = document.getElementById('tab-feed');
+        const shopBtn = document.getElementById('tab-shop');
+        const feedSection = document.getElementById('section-feed');
+        const shopSection = document.getElementById('section-shop');
+
+        if (tab === 'feed') {
+            feedBtn.classList.add('border-cultura-green', 'text-cultura-dark');
+            feedBtn.classList.remove('border-transparent', 'text-gray-300');
+            shopBtn.classList.remove('border-cultura-green', 'text-cultura-dark');
+            shopBtn.classList.add('border-transparent', 'text-gray-300');
+            
+            feedSection.classList.remove('hidden');
+            shopSection.classList.add('hidden');
+            window.scrollTo({ top: feedSection.offsetTop - 150, behavior: 'smooth' });
+        } else {
+            shopBtn.classList.add('border-cultura-green', 'text-cultura-dark');
+            shopBtn.classList.remove('border-transparent', 'text-gray-300');
+            feedBtn.classList.remove('border-cultura-green', 'text-cultura-dark');
+            feedBtn.classList.add('border-transparent', 'text-gray-300');
+            
+            shopSection.classList.remove('hidden');
+            feedSection.classList.add('hidden');
+            window.scrollTo({ top: shopSection.offsetTop - 150, behavior: 'smooth' });
+        }
+    }
+
+    $(document).ready(function () {
+        // Dropdown Logic
+        $(document).on('click', '.dropdown-toggle', function(e) {
+            e.stopPropagation();
+            const $menu = $(this).siblings('.dropdown-menu');
+            $('.dropdown-menu').not($menu).addClass('opacity-0 invisible scale-95');
+            $menu.toggleClass('opacity-0 invisible scale-95');
+        });
+
+        $(document).on('click', function() {
+            $('.dropdown-menu').addClass('opacity-0 invisible scale-95');
+        });
+
+        // Edit Post Modal
+        const editModal = $('#edit-post-modal');
+        const editFormContainer = $('#edit-form-container');
+
+        $(document).on('click', '.edit-post-btn', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    editFormContainer.html(data.html);
+                    editModal.removeClass('hidden');
+                }
+            });
+        });
+
+        $('.cancel-edit-btn').on('click', () => editModal.addClass('hidden'));
+
+        // Delete Post Modal
+        const deletePostModal = $('#delete-post-modal');
+        const confirmDeletePostBtn = $('#confirm-delete-btn');
+
+        $(document).on('click', '.delete-post-btn', function (e) {
+            e.preventDefault();
+            confirmDeletePostBtn.attr('href', $(this).attr('href'));
+            deletePostModal.removeClass('hidden');
+        });
+
+        $('.cancel-delete-btn').on('click', () => deletePostModal.addClass('hidden'));
+
+        confirmDeletePostBtn.on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('href'),
+                type: 'POST',
+                beforeSend: (xhr) => xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"),
+                dataType: 'json',
+                success: (data) => data.status === 'success' ? window.location.reload() : alert('Erro ao excluir.')
+            });
+        });
+
+        // Delete Group Modal
+        const deleteGrupoModal = $('#delete-grupo-modal');
+        const confirmDeleteGrupoBtn = $('#confirm-delete-grupo-btn');
+        let grupoDeleteUrl = '';
+
+        $('#delete-grupo-trigger-btn').on('click', function () {
+            grupoDeleteUrl = $(this).data('url');
+            deleteGrupoModal.removeClass('hidden');
+        });
+
+        $('.cancel-delete-grupo-btn').on('click', () => deleteGrupoModal.addClass('hidden'));
+
+        confirmDeleteGrupoBtn.on('click', function () {
+            $.ajax({
+                url: grupoDeleteUrl,
+                type: 'POST',
+                beforeSend: (xhr) => xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"),
+                dataType: 'json',
+                success: (data) => {
+                    if (data.status === 'success') {
+                        window.location.href = "{% url 'grupos:grupo_list' %}";
+                    } else {
+                        alert('Erro ao dissolver o grupo: ' + (data.message || 'Desconhecido'));
+                    }
+                },
+                error: (xhr) => {
+                    alert('Erro na requisição. Verifique se você tem permissão.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

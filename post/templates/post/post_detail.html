@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+
+<div class="bg-brand-cream min-h-screen py-8 md:py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+
+            <main class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden relative">
+
+                    {% if request.user.perfil == post.author or is_leader %}
+                    <div class="absolute top-4 right-4 z-10">
+                        <button data-dropdown-toggle="options-menu-{{ post.id }}"
+                            class="text-gray-700 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 focus:outline-none transition-colors duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                                </path>
+                            </svg>
+                        </button>
+                        <div id="options-menu-{{ post.id }}"
+                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 border">
+                            <a href="{% url 'post:edit_post' post.id %}"
+                                class="edit-post-btn block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editar
+                                Publicação</a>
+                            <a href="{% url 'post:post_delete' post.id %}"
+                                class="delete-post-btn block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Excluir
+                                Publicação</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if post.thumbnail_url %}
+                    <div class="w-full h-56 sm:h-64 md:h-96 bg-cover bg-center"
+                        style="background-image: url('{{ post.thumbnail_url }}');">
+                    </div>
+                    {% endif %}
+
+                    <div class="p-4 sm:p-6 md:p-10">
+                        <h1 class="font-serif text-3xl md:text-5xl font-extrabold text-brand-brown mb-4">{{ post.title}}
+                        </h1>
+                        <div class="flex items-center text-gray-600 mb-8">
+                            <img src="{{ post.author.avatar }}" alt="Avatar de {{ post.author.user.username }}"
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover mr-3 sm:mr-4 border-2 border-brand-gold">
+                            <div>
+                                <p class="font-bold text-brand-brown">{{ post.author.user.username }}</p>
+                                <p class="text-sm">Publicado em {{ post.created_at|date:"d \d\e F \d\e Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="prose prose-lg max-w-none text-gray-800">
+                            {{ post.content|safe }}
+                        </div>
+                    </div>
+                </div>
+
+                {% if post.comments_enabled %}
+                <div class="bg-white rounded-xl shadow-lg mt-8 p-4 sm:p-6 md:p-10">
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-brand-brown border-b pb-4 mb-6">
+                        Comentários ({{ post.comments.count }})</h2>
+
+                    {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'comments:comment_create' post.id %}" class="mb-8">
+                        {% csrf_token %}
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <img src="{{ request.user.perfil.avatar }}" alt="Seu avatar"
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover mt-1 flex-shrink-0">
+                            <div class="flex-grow">
+                                {{ comment_form.content.errors }}
+                                <textarea name="{{ comment_form.content.name }}"
+                                    id="{{ comment_form.content.id_for_label }}" rows="4"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition"
+                                    placeholder="Deixe seu comentário..."></textarea>
+                                <button type="submit"
+                                    class="mt-3 bg-brand-gold hover:bg-yellow-500 text-brand-brown font-bold py-2 px-6 rounded-full transition duration-300">
+                                    Comentar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="text-center p-4 border rounded-lg bg-gray-50 mb-8">
+                        <p>Você precisa <a href="{% url 'home:login' %}"
+                                class="font-bold text-brand-brown hover:underline">fazer login</a> para comentar.</p>
+                    </div>
+                    {% endif %}
+                    <div class="space-y-6">
+                        {% for comment in post.comments.all|slice:":10" %}
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <img src="{{ comment.author.avatar }}" alt="Avatar de {{ comment.author.user.username }}"
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0">
+                            <div class="flex-grow">
+                                <div class="bg-gray-100 p-3 sm:p-4 rounded-lg">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-bold text-brand-brown">{{ comment.author.user.username }}</p>
+                                        <p class="text-xs text-gray-500 whitespace-nowrap ml-2">
+                                            {{ comment.created_at|timesince }} atrás</p>
+                                    </div>
+                                    <p class="text-gray-800 break-words">{{ comment.content|linebreaksbr }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-gray-500 py-4">Ainda não há comentários. Seja o primeiro a comentar!
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </main>
+
+            <aside class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-xl shadow-lg lg:sticky top-28">
+                    {% if post.grupo %}
+                    <h3 class="font-serif text-xl font-bold text-brand-brown border-b pb-3 mb-4">Sobre o Grupo</h3>
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ post.grupo.thumbnail_url }}" alt="Logo do grupo {{ post.grupo.name }}"
+                            class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                        <div>
+                            <h4 class="font-bold text-brand-brown text-lg">{{ post.grupo.name }}</h4>
+                            <a href="{% url 'grupos:grupo_detail' post.grupo.id %}"
+                                class="text-sm font-semibold text-brand-gold hover:underline">Ver página do grupo</a>
+                        </div>
+                    </div>
+                    {% elif post.artista %}
+                    <h3 class="font-serif text-xl font-bold text-brand-brown border-b pb-3 mb-4">Sobre o Artista</h3>
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ post.artista.photo_url }}" alt="Foto de {{ post.artista.name }}"
+                            class="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm">
+                        <div>
+                            <h4 class="font-bold text-brand-brown text-lg">{{ post.artista.name }}</h4>
+                            <a href="{% url 'artistas:artista_detail' post.artista.pk %}"
+                                class="text-sm font-semibold text-brand-gold hover:underline">Ver perfil do artista</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>
+
+<div id="edit-post-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-3xl relative max-h-[90vh] flex flex-col">
+        <div class="flex-shrink-0">
+            <h2 class="font-serif text-3xl font-bold text-brand-brown mb-6">Editar Publicação</h2>
+        </div>
+        <div id="edit-form-container" class="overflow-y-auto">
+        </div>
+    </div>
+</div>
+
+<div id="delete-post-modal"
+    class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md relative text-center">
+        <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+            <svg class="h-6 w-6 text-red-600" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <h3 class="font-serif text-2xl font-bold text-brand-brown mt-5">Confirmar Exclusão</h3>
+        <div class="mt-2">
+            <p class="text-base text-gray-600">Você tem certeza de que deseja excluir esta publicação?</p>
+            <p class="text-sm text-gray-500 mt-1">Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="mt-8 flex justify-center space-x-4">
+            <button type="button"
+                class="cancel-delete-btn px-6 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition">
+                Cancelar
+            </button>
+            <a href="#" id="confirm-delete-btn"
+                class="px-6 py-2 rounded-md text-white bg-red-600 hover:bg-red-700 transition font-semibold">
+                Sim, Excluir
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+    // === Menu de três pontinhos ===
+    document.addEventListener('click', function (event) {
+        const isDropdownButton = event.target.closest('[data-dropdown-toggle]');
+        // Esconde todos os menus abertos
+        document.querySelectorAll('[id^="options-menu-"]').forEach(menu => {
+            const button = document.querySelector(`[data-dropdown-toggle="${menu.id}"]`);
+            // Se o clique não foi no botão do menu atual, esconde o menu
+            if (button !== isDropdownButton) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Se um botão de dropdown foi clicado, alterna a visibilidade do seu menu
+        if (isDropdownButton) {
+            const dropdownId = isDropdownButton.getAttribute('data-dropdown-toggle');
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('hidden');
+        }
+    });
+
+
+    // === Lógica dos Modais com jQuery ===
+    $(document).ready(function () {
+        // --- Variáveis do Modal de Edição ---
+        const editModal = $('#edit-post-modal');
+        const editFormContainer = $('#edit-form-container');
+
+        // --- Abrir modal de edição ---
+        $(document).on('click', '.edit-post-btn', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    editFormContainer.html(data.html);
+                    editModal.removeClass('hidden');
+                },
+                error: function (xhr) {
+                    console.error('Erro ao carregar formulário de edição:', xhr.responseText);
+                    alert('Erro ao carregar o formulário de edição.');
+                }
+            });
+        });
+
+        // --- Fechar modal de edição ---
+        $(document).on('click', '.cancel-edit-btn, #edit-post-modal', function (e) {
+            if ($(e.target).is('.cancel-edit-btn') || $(e.target).is('#edit-post-modal')) {
+                e.preventDefault();
+                editModal.addClass('hidden');
+                editFormContainer.html(''); // Limpa o conteúdo
+            }
+        });
+
+        // --- Enviar formulário de edição via AJAX ---
+        editFormContainer.on('submit', 'form', function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const url = form.attr('action');
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status === 'success') {
+                        editModal.addClass('hidden');
+                        editFormContainer.html('');
+                        window.location.reload(); // Recarrega para exibir post atualizado
+                    } else {
+                        editFormContainer.html(data.html); // Mostra erros de validação
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Erro na requisição AJAX:', xhr.responseText);
+                    alert('Ocorreu um erro ao salvar as alterações.');
+                }
+            });
+        });
+
+        const deleteModal = $('#delete-post-modal');
+        const confirmDeleteBtn = $('#confirm-delete-btn');
+        $(document).on('click', '.delete-post-btn', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            confirmDeleteBtn.attr('href', url);
+            deleteModal.removeClass('hidden');
+        });
+        $(document).on('click', '#delete-post-modal, .cancel-delete-btn', function (e) {
+            if ($(e.target).is('#delete-post-modal') || $(e.target).is('.cancel-delete-btn')) {
+                e.preventDefault();
+                deleteModal.addClass('hidden');
+            }
+        });
+
+        confirmDeleteBtn.on('click', function (e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status === 'success') {
+                        alert("Publicação excluída com sucesso.");
+                        {% if post.grupo %}
+                        window.location.href = "{% url 'grupos:grupo_detail' post.grupo.id %}";
+                        {% elif post.artista %}
+                        window.location.href = "{% url 'artistas:artista_detail' post.artista.pk %}";
+                        {% else %}
+                    window.location.href = "{% url 'home:index' %}";
+                    {% endif %}
+                    } else {
+        alert('Erro ao excluir a publicação: ' + data.message);
+    deleteModal.addClass('hidden');
+                    }
+                },
+    error: function (xhr) {
+        console.error('Erro ao excluir via AJAX:', xhr.responseText);
+        alert('Ocorreu um erro inesperado. Tente novamente.');
+    }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

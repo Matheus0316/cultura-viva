@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão - {{ service.name }}{% endblock %}
+
+{% block content %}
+<section class="bg-cultura-sand-light min-h-screen flex items-center justify-center p-6 pt-32">
+    <div class="bg-white w-full max-w-md rounded-[3rem] shadow-premium p-12 text-center" data-aos="zoom-in">
+        <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8">
+            <i class="fa-solid fa-calendar-xmark text-3xl"></i>
+        </div>
+        <h3 class="font-serif italic text-3xl text-cultura-dark mb-4">Remover Serviço?</h3>
+        <p class="text-gray-400 font-light mb-10 leading-relaxed">
+            Você está prestes a excluir <strong>{{ service.name }}</strong> e todos os horários associados. Esta ação não pode ser desfeita.
+        </p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <a href="{% url 'shop:service_detail' service.id %}" class="flex-grow py-5 rounded-full bg-cultura-sand-light text-gray-500 font-display font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition">
+                    Cancelar
+                </a>
+                <button type="submit" class="flex-grow py-5 rounded-full bg-red-500 text-white font-display font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition shadow-lg shadow-red-200">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ perfil.user.get_full_name|default:perfil.user.username }} - Perfil{% endblock %}
+
+{% block content %}
+
+<div class="bg-cultura-sand-light min-h-screen py-16">
+    <div class="container mx-auto px-6">
+
+        <!-- Premium Profile Header -->
+        <div class="max-w-6xl mx-auto mb-16 overflow-hidden rounded-[3rem] bg-white shadow-premium border border-gray-100" data-aos="fade-up">
+            <!-- Decorative Banner -->
+            <div class="h-48 md:h-64 bg-gradient-to-r from-cultura-terracotta via-cultura-dark to-cultura-green opacity-90 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute -top-24 -left-24 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
+            </div>
+
+            <div class="px-8 md:px-12 pb-12">
+                <div class="flex flex-col md:flex-row items-end gap-8 -mt-24 md:-mt-32 relative z-10">
+                    <!-- Avatar with Glow -->
+                    <div class="relative group">
+                        <div class="absolute inset-0 bg-cultura-terracotta/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+                        <img src="{{ perfil.avatar }}" alt="Avatar de {{ perfil.user.username }}"
+                             class="relative w-40 h-40 md:w-56 md:h-56 rounded-full object-cover border-[6px] md:border-[10px] border-white shadow-2xl transition-transform duration-700 hover:scale-[1.02]">
+                        <div class="absolute bottom-4 right-4 bg-cultura-terracotta text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                            <i class="fa-solid fa-user-check text-xs md:text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- Profile Name & Meta -->
+                    <div class="flex-grow pb-4 text-center md:text-left">
+                        <div class="inline-flex items-center gap-2 bg-cultura-sand-light px-3 py-1 rounded-full mb-3">
+                            <span class="w-1.5 h-1.5 bg-cultura-green rounded-full animate-pulse"></span>
+                            <span class="text-[9px] font-display font-black uppercase tracking-widest text-cultura-dark">Membro da Comunidade</span>
+                        </div>
+                        <h1 class="font-serif italic text-4xl md:text-6xl text-cultura-dark mb-2 leading-tight">
+                            {{ perfil.user.get_full_name|default:perfil.user.username }}
+                        </h1>
+                        <p class="text-cultura-terracotta font-display font-bold text-xs uppercase tracking-[0.3em]">@{{ perfil.user.username }}</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pb-6 w-full md:w-auto">
+                        {% if request.user == perfil.user %}
+                            <button hx-get="{% url 'perfil:profile_edit' perfil.id %}" 
+                                    hx-target="#modal-container" 
+                                    class="w-full md:w-auto bg-cultura-dark text-white font-display font-extrabold py-4 px-10 rounded-full text-[11px] uppercase tracking-[0.2em] transition-all duration-500 shadow-premium hover:shadow-premium-hover hover:-translate-y-1 hover:bg-cultura-terracotta">
+                                EDITAR PERFIL
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bio Section -->
+                <div class="mt-16 pt-12 border-t border-gray-50 max-w-4xl">
+                    <h2 class="font-display font-black text-[10px] text-gray-400 uppercase tracking-[0.4em] mb-6">Manifesto & Trajetória</h2>
+                    <div class="text-gray-500 font-light text-lg leading-relaxed italic font-serif">
+                        {{ perfil.bio|linebreaks|default:"Este membro ainda está tecendo sua história na nossa plataforma." }}
+                    </div>
+                </div>
+
+                <!-- Addresses Section -->
+                {% if request.user == perfil.user %}
+                <div class="mt-16 pt-12 border-t border-gray-50">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 class="font-display font-black text-[10px] text-gray-400 uppercase tracking-[0.4em] mb-1">Localizações & Endereços</h2>
+                            <p class="text-xs text-gray-300">Gerencie seus endereços para cálculo de distância e logística.</p>
+                        </div>
+                        <button hx-get="{% url 'perfil:address_add' %}" hx-target="#modal-container" class="bg-cultura-sand-light text-cultura-dark p-4 rounded-2xl hover:bg-cultura-green hover:text-white transition-all">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </button>
+                    </div>
+
+                    <div id="address-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for addr in addresses %}
+                        <div class="bg-cultura-sand-light/30 rounded-[2rem] p-6 border border-transparent hover:border-cultura-green/20 transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-cultura-green shadow-sm">
+                                        <i class="fa-solid fa-map-location-dot text-xs"></i>
+                                    </div>
+                                    {% if addr.is_main %}
+                                    <span class="text-[8px] font-display font-black uppercase tracking-widest bg-cultura-green text-white px-2 py-1 rounded-md">Principal</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button hx-get="{% url 'perfil:address_edit' addr.pk %}" hx-target="#modal-container" class="w-8 h-8 rounded-lg bg-white text-gray-400 hover:text-cultura-green shadow-sm flex items-center justify-center transition-all">
+                                        <i class="fa-solid fa-pen text-[10px]"></i>
+                                    </button>
+                                    <form method="POST" action="{% url 'perfil:address_delete' addr.pk %}" onsubmit="return confirm('Excluir este endereço?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="w-8 h-8 rounded-lg bg-white text-gray-400 hover:text-red-500 shadow-sm flex items-center justify-center transition-all">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p class="text-cultura-dark font-display font-bold text-xs mb-1">{{ addr.street }}, {{ addr.number }}</p>
+                            <p class="text-gray-400 text-[10px] font-medium uppercase tracking-widest">{{ addr.neighborhood }} — {{ addr.city }}/{{ addr.state }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="md:col-span-2 py-10 text-center border-2 border-dashed border-gray-100 rounded-[2rem]">
+                            <p class="text-[10px] font-display font-black text-gray-300 uppercase tracking-widest">Nenhum endereço cadastrado.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Groups Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            
+            <!-- Member of -->
+            <div data-aos="fade-right">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-10 h-10 rounded-2xl bg-cultura-terracotta/10 flex items-center justify-center text-cultura-terracotta">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <h3 class="font-serif italic text-2xl text-cultura-dark">Integração Cultural</h3>
+                </div>
+                
+                <div class="grid gap-6">
+                    {% for grupo in member_of %}
+                        <a href="{% url 'grupos:grupo_detail' grupo.grupo.id %}" class="group flex items-center gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 hover:-translate-y-1">
+                            <div class="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0">
+                                <img src="{{ grupo.grupo.thumbnail_url }}" alt="{{ grupo.grupo.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-cultura-dark/10 group-hover:bg-transparent"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-serif italic text-xl text-cultura-dark mb-1 group-hover:text-cultura-terracotta transition-colors">{{ grupo.grupo.name }}</h4>
+                                <p class="text-[9px] font-display font-black uppercase tracking-widest text-cultura-green">{{ grupo.position.position|default:"MEMBRO ATIVO" }}</p>
+                            </div>
+                            <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <div class="p-12 text-center bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                            <p class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest">Nenhuma afiliação registrada.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Following -->
+            <div data-aos="fade-left">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-10 h-10 rounded-2xl bg-cultura-green/10 flex items-center justify-center text-cultura-green">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <h3 class="font-serif italic text-2xl text-cultura-dark">Inspirações</h3>
+                </div>
+
+                <div class="grid gap-6">
+                    {% for grupo in seguindo %}
+                        <a href="{% url 'grupos:grupo_detail' grupo.grupo.id %}" class="group flex items-center gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 hover:-translate-y-1">
+                            <div class="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0">
+                                <img src="{{ grupo.grupo.thumbnail_url }}" alt="{{ grupo.grupo.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            </div>
+                            <div>
+                                <h4 class="font-serif italic text-xl text-cultura-dark mb-1 group-hover:text-cultura-terracotta transition-colors">{{ grupo.grupo.name }}</h4>
+                                <p class="text-[9px] font-display font-black uppercase tracking-widest text-gray-400">SEGUINDO COLETIVO</p>
+                            </div>
+                            <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <div class="p-12 text-center bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                            <p class="text-[10px] font-display font-black text-gray-400 uppercase tracking-widest">Nenhuma inspiração seguida ainda.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

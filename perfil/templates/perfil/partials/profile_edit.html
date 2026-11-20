@@ -1,0 +1,154 @@
+<!-- Premium Profile Edit Modal -->
+<div id="edit-profile-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-cultura-dark/40 backdrop-blur-sm transition-all duration-500">
+    <!-- Modal Content -->
+    <div class="bg-white rounded-[3rem] shadow-premium w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-700 scale-100 border border-white/20" data-aos="zoom-in">
+        
+        <!-- Modal Header -->
+        <div class="px-10 py-8 flex justify-between items-center border-b border-gray-50">
+            <div>
+                <span class="text-[9px] font-display font-black text-cultura-green uppercase tracking-[0.3em] mb-2 block">Personalização</span>
+                <h3 class="font-serif italic text-3xl text-cultura-dark">Lapidar Perfil</h3>
+            </div>
+            <button onclick="document.getElementById('edit-profile-modal').classList.add('opacity-0', 'scale-95'); setTimeout(() => document.getElementById('edit-profile-modal').remove(), 300)" 
+                class="w-12 h-12 rounded-full flex items-center justify-center text-gray-300 hover:bg-gray-50 hover:text-cultura-dark transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body (Form) -->
+        <div class="p-10 overflow-y-auto custom-scrollbar bg-cultura-sand-light/30">
+            <form id="profile-edit-form" 
+                  hx-post="{% url 'perfil:profile_edit' perfil.id %}" 
+                  hx-target="#edit-profile-modal" 
+                  hx-swap="outerHTML"
+                  enctype="multipart/form-data"
+                  class="space-y-10">
+                {% csrf_token %}
+                
+                <!-- Profile Image Uplod -->
+                <div class="relative group">
+                    <div class="flex items-center gap-8 p-6 bg-white rounded-[2rem] border border-gray-50 shadow-sm group-hover:shadow-md transition-shadow">
+                        <div class="relative">
+                            <img src="{{ perfil.avatar }}" class="w-24 h-24 rounded-full object-cover border-4 border-cultura-sand-light shadow-sm">
+                            <label for="{{ form.icon.id_for_label }}" class="absolute bottom-0 right-0 w-8 h-8 bg-cultura-dark text-white rounded-full flex items-center justify-center cursor-pointer hover:bg-cultura-green transition-colors shadow-lg">
+                                <i class="fa-solid fa-camera text-[10px]"></i>
+                            </label>
+                        </div>
+                        <div class="flex-grow">
+                             <h4 class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest mb-2">Avatar de Identidade</h4>
+                             {{ form.icon }}
+                             <p class="text-gray-300 text-[10px] font-medium mt-2">Formatos: JPG, PNG. Máx: 2MB.</p>
+                        </div>
+                    </div>
+                    {% if form.icon.errors %}
+                        <p class="text-red-400 text-[10px] font-bold mt-2 ml-4">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ form.icon.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Nome -->
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.name.label }}</label>
+                        <div class="relative">
+                            {{ form.name }}
+                        </div>
+                        {% if form.name.errors %}
+                            <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.email.label }}</label>
+                        <div class="relative">
+                            {{ form.email }}
+                        </div>
+                        {% if form.email.errors %}
+                            <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Idade -->
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.age.label }}</label>
+                        <div class="relative">
+                            {{ form.age }}
+                        </div>
+                        {% if form.age.errors %}
+                            <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.age.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Sexo -->
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.sex.label }}</label>
+                        <div class="relative">
+                            {{ form.sex }}
+                        </div>
+                        {% if form.sex.errors %}
+                            <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.sex.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- CPF -->
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.cpf.label }}</label>
+                        <div class="relative">
+                            {{ form.cpf }}
+                        </div>
+                        {% if form.cpf.errors %}
+                            <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.cpf.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-display font-black text-gray-400 uppercase tracking-widest ml-4">{{ form.bio.label }}</label>
+                    <div class="relative">
+                        {{ form.bio }}
+                    </div>
+                    {% if form.bio.errors %}
+                        <p class="text-red-400 text-[10px] font-bold ml-4">{{ form.bio.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="pt-10 flex gap-4">
+                    <button type="submit" 
+                            class="flex-grow py-5 bg-cultura-dark text-white rounded-full text-[10px] font-display font-black uppercase tracking-[0.2em] hover:bg-cultura-green transition-all duration-500 shadow-premium active:scale-95">
+                        Consolidar Alterações
+                    </button>
+                    <button type="button" 
+                            onclick="document.getElementById('edit-profile-modal').classList.add('opacity-0', 'scale-95'); setTimeout(() => document.getElementById('edit-profile-modal').remove(), 300)" 
+                            class="px-10 py-5 bg-white text-gray-400 border border-gray-100 rounded-full text-[10px] font-display font-black uppercase tracking-widest hover:text-cultura-dark hover:bg-gray-50 transition-all">
+                        Desistir
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    #profile-edit-form input, #profile-edit-form select, #profile-edit-form textarea {
+        width: 100%;
+        padding: 1.25rem 1.5rem;
+        background-color: white;
+        border-radius: 1.5rem;
+        border: 1px solid #F3F4F6;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    #profile-edit-form input:focus, #profile-edit-form select:focus, #profile-edit-form textarea:focus {
+        border-color: #22C55E;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        outline: none;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+</style>

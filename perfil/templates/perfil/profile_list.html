@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Ecossistema Humano{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light pt-12 pb-24 min-h-screen">
+    <div class="container mx-auto px-6">
+        
+        <!-- Premium Header Area -->
+        <div class="max-w-4xl mx-auto text-center mb-20" data-aos="fade-up">
+            <div class="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-full shadow-premium mb-8">
+                <span class="w-1.5 h-1.5 bg-cultura-green rounded-full"></span>
+                <span class="text-[10px] font-display font-black uppercase tracking-widest text-cultura-dark">Comunidade Viva</span>
+            </div>
+            
+            <h1 class="font-serif italic text-5xl md:text-7xl text-cultura-dark mb-8 leading-tight">
+                {{ title }}
+            </h1>
+            
+            <p class="text-gray-400 text-lg font-light leading-relaxed">
+                {{ subtitle|default:"Conecte-se com as mentes e corações que movem a cultura em nossa região." }}
+            </p>
+        </div>
+
+        <!-- Advanced Filter & Search Bar -->
+        <div class="max-w-5xl mx-auto mb-16" data-aos="fade-up">
+            <div class="flex flex-col lg:flex-row items-center gap-6 p-3 bg-white/60 backdrop-blur-xl rounded-[2.5rem] shadow-premium border border-white">
+                
+                <!-- Expanded Search -->
+                <div class="relative w-full lg:flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                    <input type="search" id="search-input" value="{{ request.GET.search }}"
+                        placeholder="Buscar por nome, @usuário..."
+                        class="w-full pl-14 pr-8 py-5 bg-white rounded-[2rem] border-none focus:ring-2 focus:ring-cultura-green/20 text-sm font-display font-medium text-cultura-dark placeholder:text-gray-300 transition-all shadow-sm">
+                </div>
+
+                <!-- Sophisticated Filter Chips -->
+                <div id="filter-buttons" class="flex flex-wrap items-center gap-2 px-4 lg:px-2">
+                    <a href="?filter=todos" data-filter="todos" 
+                        class="filter-btn px-6 py-4 rounded-full text-[9px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if not request.GET.filter or request.GET.filter == 'todos' %}bg-cultura-dark text-white shadow-lg{% else %}text-gray-400 hover:text-cultura-dark hover:bg-white{% endif %}">
+                        Todos
+                    </a>
+                    <a href="?filter=membro" data-filter="membro" 
+                        class="filter-btn px-6 py-4 rounded-full text-[9px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if request.GET.filter == 'membro' %}bg-cultura-dark text-white shadow-lg{% else %}text-gray-400 hover:text-cultura-dark hover:bg-white{% endif %}">
+                        Membros
+                    </a>
+                    <a href="?filter=seguidor" data-filter="seguidor" 
+                        class="filter-btn px-6 py-4 rounded-full text-[9px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if request.GET.filter == 'seguidor' %}bg-cultura-dark text-white shadow-lg{% else %}text-gray-400 hover:text-cultura-dark hover:bg-white{% endif %}">
+                        Seguidores
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Grid -->
+        <div id="profile-grid-container" class="min-h-[400px]" data-aos="fade-up">
+            {% include 'perfil/partials/profiles.html' %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+    let searchTimeout;
+
+    // AJAX Search
+    $('#search-input').on('keyup', function() {
+        const query = $(this).val();
+        const filter = $('.filter-btn.bg-cultura-dark').data('filter') || 'todos';
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(function() {
+            const url = window.location.pathname + '?search=' + encodeURIComponent(query) + '&filter=' + filter;
+            
+            // Visual feedback
+            $('#profile-grid-container').css('opacity', '0.5');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#profile-grid-container').html(data.html).css('opacity', '1');
+                    history.pushState(null, '', url);
+                }
+            });
+        }, 400);
+    });
+
+    // AJAX Filter
+    $('#filter-buttons').on('click', '.filter-btn', function(e) {
+        e.preventDefault();
+        
+        const filterValue = $(this).data('filter');
+        const searchQuery = $('#search-input').val();
+        const url = window.location.pathname + '?filter=' + filterValue + '&search=' + encodeURIComponent(searchQuery);
+
+        // UI Update
+        $('.filter-btn').removeClass('bg-cultura-dark text-white shadow-lg').addClass('text-gray-400 hover:text-cultura-dark hover:bg-white');
+        $(this).removeClass('text-gray-400 hover:text-cultura-dark hover:bg-white').addClass('bg-cultura-dark text-white shadow-lg');
+        
+        $('#profile-grid-container').css('opacity', '0.5');
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                $('#profile-grid-container').html(data.html).css('opacity', '1');
+                history.pushState(null, '', url);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

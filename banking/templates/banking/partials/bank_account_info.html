@@ -1,0 +1,49 @@
+<div id="bank-account-display" 
+     hx-trigger="bankAccountUpdated from:body"
+     hx-get="{% url 'banking:bank_account_info' seller_type obj.id %}"
+     hx-swap="outerHTML"
+     class="flex flex-col md:flex-row items-center justify-between gap-8 p-8 bg-cultura-sand-light/30 rounded-3xl border border-white">
+    <div class="flex items-center gap-6">
+        <div class="h-14 w-14 rounded-2xl bg-white flex items-center justify-center text-cultura-dark shadow-sm">
+            <i class="fa-solid fa-university text-xl"></i>
+        </div>
+        <div>
+            {% if bank_account %}
+                <h3 class="font-display font-black text-lg text-cultura-dark uppercase tracking-wider">{{ bank_account.bank_name }}</h3>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                    Ag: {{ bank_account.agency }} | Conta: {{ bank_account.account_number }} ({{ bank_account.get_account_type_display }})
+                </p>
+                <p class="text-[10px] font-bold text-cultura-green uppercase tracking-widest mt-1">
+                    Titular: {{ bank_account.document_name }} 
+                    {% if bank_account.birth_date %}({{ bank_account.birth_date|date:"d/m/Y" }}){% endif %}
+                </p>
+            {% else %}
+                <h3 class="font-display font-black text-lg text-gray-400 uppercase tracking-wider">Nenhuma conta vinculada</h3>
+                <p class="text-[10px] font-bold text-gray-300 uppercase tracking-widest mt-1">
+                    Configure seus dados bancários para receber pagamentos.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <button hx-get="{% url 'banking:bank_account_form' seller_type obj.id %}" 
+            hx-target="#modal-container" 
+            class="px-8 py-3 bg-cultura-dark text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-cultura-terracotta transition-all shadow-md">
+        {% if bank_account %}Alterar Dados{% else %}Configurar Agora{% endif %}
+    </button>
+</div>
+
+{% if success %}
+<div id="success-toast" class="fixed bottom-10 right-10 z-[100] animate-in slide-in-from-right-10 duration-500">
+    <div class="bg-cultura-green text-white px-8 py-4 rounded-2xl shadow-premium flex items-center gap-4">
+        <i class="fa-solid fa-circle-check"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest">Dados Salvos com Sucesso</span>
+    </div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('success-toast').classList.add('animate-out', 'fade-out', 'duration-500');
+            setTimeout(() => document.getElementById('success-toast').remove(), 500);
+        }, 3000);
+    </script>
+</div>
+{% endif %}

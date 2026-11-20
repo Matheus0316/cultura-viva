@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Grupo Criado!{% endblock %}
+
+{% block content %}
+
+<section class="bg-brand-cream py-16 md:py-24">
+    <div class="container mx-auto px-6 flex justify-center">
+
+        <div class="w-full max-w-lg bg-white rounded-xl shadow-2xl text-center p-8 md:p-12">
+
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+
+            <h1 class="font-serif text-3xl md:text-4xl font-bold text-brand-brown mt-6">
+                Grupo Criado!
+            </h1>
+            <p class="text-gray-600 mt-3 text-lg">
+                O grupo "<strong>{{ grupo.name }}</strong>" foi criado com sucesso.
+            </p>
+
+            <div class="mt-8 space-y-4">
+                <a href="{% url 'grupos:grupo_detail' grupo.id %}"
+                   class="block w-full bg-brand-brown hover:bg-opacity-80 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300">
+                    Ver Página do Grupo
+                </a>
+                <a href="{% url 'grupos:grupo_create' %}"
+                   class="block w-full bg-gray-100 hover:bg-gray-200 text-brand-brown font-bold py-3 px-8 rounded-full text-lg transition duration-300">
+                    Criar Outro Grupo
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'emails/base_email.html' %}
+
+{% block content %}
+<h2 style="color: #E07A5F; margin-top: 0;">{{ title }}</h2>
+
+<div style="font-size: 16px;">
+    {{ message|linebreaks }}
+</div>
+
+{% if action_url %}
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ action_url }}" class="btn">
+        {{ action_text|default:"Acessar Plataforma" }}
+    </a>
+</div>
+{% endif %}
+
+<p style="margin-top: 30px; font-size: 14px; color: #666;">
+    Atenciosamente,<br>
+    <strong>Equipe Cultura Viva Tacima</strong>
+</p>
+{% endblock %}

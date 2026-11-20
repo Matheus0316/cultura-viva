@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Patrimônio Coletivo{% endblock %}
+
+{% block content %}
+
+<section class="bg-cultura-sand-light pt-12 pb-24 min-h-screen">
+    <div class="container mx-auto px-6">
+
+        <!-- Premium Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+            <div data-aos="fade-right">
+                <div class="inline-flex items-center gap-3 mb-4">
+                    <span class="h-[2px] w-12 bg-cultura-green"></span>
+                    <span class="text-cultura-green font-display font-black text-[10px] tracking-[0.3em] uppercase">Ecos Coletivos</span>
+                </div>
+                <h1 class="font-serif italic text-5xl md:text-7xl text-cultura-dark leading-tight">
+                    {% if current_category == 'PROJETO_SOCIAL' %}Projetos <br><span class="not-italic font-display font-black text-cultura-green/20">Sociais</span>
+                    {% elif current_category == 'COLETIVO' %}Coletivos <br><span class="not-italic font-display font-black text-cultura-green/20">Culturais</span>
+                    {% else %}Catálogo <br><span class="not-italic font-display font-black text-cultura-green/20">Cultural</span>{% endif %}
+                </h1>
+            </div>
+
+            <div class="w-full md:w-auto" data-aos="fade-left">
+                {% if user.is_authenticated %}
+                <a href="{% url 'grupos:grupo_create' %}"
+                    class="group flex items-center gap-3 px-8 py-5 bg-cultura-dark text-white font-display font-extrabold text-[11px] uppercase tracking-widest rounded-full hover:bg-cultura-green transition-all duration-500 shadow-premium hover:shadow-premium-hover hover:-translate-y-1">
+                    <i class="fa-solid fa-plus text-lg group-hover:rotate-90 transition-transform"></i>
+                    Cadastrar Nova Iniciativa
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sophisticated Search & Filters Block -->
+        <div class="max-w-6xl mx-auto mb-20 space-y-12" data-aos="fade-up">
+            <!-- Search Bar -->
+            <form id="search-form" method="GET" action="{% url 'grupos:grupo_list' %}" class="relative max-w-3xl mx-auto">
+                {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-cultura-green/20 to-cultura-terracotta/20 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-6 text-gray-300 group-focus-within:text-cultura-green transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </span>
+                    <input type="search" name="search" value="{{ request.GET.search }}" placeholder="Sondar o ecossistema cultural..."
+                        class="relative w-full py-6 pl-16 pr-6 text-cultura-dark bg-white/80 backdrop-blur-xl border border-white shadow-premium rounded-full focus:outline-none focus:ring-2 focus:ring-cultura-green transition-all duration-500 text-sm font-light tracking-wide">
+                </div>
+            </form>
+
+            <!-- Category Chips -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="?category="
+                    class="px-8 py-3 rounded-full border-2 text-[10px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if not current_category %}bg-cultura-dark text-white border-cultura-dark shadow-xl scale-110{% else %}border-gray-100 text-gray-400 hover:border-cultura-green hover:text-cultura-green{% endif %}">
+                    Todos
+                </a>
+                <a href="?category=PROJETO_SOCIAL"
+                    class="px-8 py-3 rounded-full border-2 text-[10px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if current_category == 'PROJETO_SOCIAL' %}bg-cultura-dark text-white border-cultura-dark shadow-xl scale-110{% else %}border-gray-100 text-gray-400 hover:border-cultura-green hover:text-cultura-green{% endif %}">
+                    Projetos Sociais
+                </a>
+                <a href="?category=COLETIVO"
+                    class="px-8 py-3 rounded-full border-2 text-[10px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if current_category == 'COLETIVO' %}bg-cultura-dark text-white border-cultura-dark shadow-xl scale-110{% else %}border-gray-100 text-gray-400 hover:border-cultura-green hover:text-cultura-green{% endif %}">
+                    Coletivos
+                </a>
+                <a href="?category=OFICINA"
+                    class="px-8 py-3 rounded-full border-2 text-[10px] font-display font-black uppercase tracking-widest transition-all duration-300 {% if current_category == 'OFICINA' %}bg-cultura-dark text-white border-cultura-dark shadow-xl scale-110{% else %}border-gray-100 text-gray-400 hover:border-cultura-green hover:text-cultura-green{% endif %}">
+                    Oficinas
+                </a>
+            </div>
+        </div>
+
+        <!-- Dynamic Results Container -->
+        <div id="grupos-container" class="max-w-6xl mx-auto" data-aos="fade-up">
+            {% include 'grupos/partials/grupos.html' %}
+        </div>
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        const container = $('#grupos-container');
+        const searchForm = $('#search-form');
+        const searchInput = $('input[name="search"]');
+        let debounceTimer;
+
+        const loadContent = (url) => {
+            container.addClass('opacity-50 pointer-events-none');
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (data) {
+                    if (url !== window.location.href) {
+                        window.history.pushState({ path: url }, '', url);
+                    }
+                    container.html(data.html);
+                    container.removeClass('opacity-50 pointer-events-none');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Erro na requisição AJAX:", error);
+                    container.removeClass('opacity-50 pointer-events-none');
+                }
+            });
+        };
+
+        searchInput.on('input', function (event) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const category = $('input[name="category"]').val();
+                let url = `${searchForm.attr('action')}?search=${searchInput.val()}`;
+                if (category) url += `&category=${category}`;
+                loadContent(url);
+            }, 500);
+        });
+
+        container.on('click', 'a.pagination-link', function (event) {
+            event.preventDefault();
+            const url = $(this).attr('href');
+            loadContent(url);
+        });
+
+        window.onpopstate = function (event) {
+            if (event.state) loadContent(event.state.path);
+            else location.reload();
+        };
+    });
+</script>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+{% endblock %}

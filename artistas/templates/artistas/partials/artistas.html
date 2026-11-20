@@ -1,0 +1,79 @@
+{% if artistas %}
+<!-- Premium Artist Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+    {% for artista in artistas %}
+    <article class="group relative" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+        <a href="{% url 'artistas:artista_detail' artista.pk %}" class="block">
+            <!-- Circular Profile Container with Glass Border -->
+            <div class="relative aspect-square mb-8 p-3 rounded-full border-2 border-dashed border-gray-100 group-hover:border-cultura-terracotta transition-all duration-700">
+                <div class="w-full h-full rounded-full overflow-hidden relative shadow-premium group-hover:shadow-premium-hover transition-all duration-1000">
+                    <img src="{{ artista.photo_url }}" alt="{{ artista.name }}" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000">
+                    <div class="absolute inset-0 bg-gradient-to-t from-cultura-dark/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                
+                <!-- Floating Category Icon Placeholder/Indicator -->
+                <div class="absolute top-2 right-2 md:top-4 md:right-4 bg-white text-cultura-dark w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg border-2 border-gray-50 transform group-hover:rotate-12 transition-transform">
+                    <i class="fa-solid fa-star text-[10px] text-cultura-yellow"></i>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="text-center px-4">
+                <span class="inline-block text-cultura-terracotta font-display font-black text-[9px] uppercase tracking-[0.3em] mb-2">{{ artista.get_category_display }}</span>
+                <h3 class="font-serif italic text-2xl md:text-3xl text-cultura-dark mb-4 transition-colors group-hover:text-cultura-terracotta">{{ artista.name }}</h3>
+            </div>
+        </a>
+
+        <!-- Social Links -->
+        <div class="flex justify-center gap-6 py-4 border-t border-gray-100 mx-auto w-max opacity-20 group-hover:opacity-100 transition-all duration-500">
+            {% if artista.instagram %}
+            <a href="{{ artista.instagram }}" target="_blank" class="text-gray-400 hover:text-cultura-terracotta transition-colors text-sm">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+            {% endif %}
+            {% if artista.whatsapp %}
+            <a href="https://wa.me/55{{ artista.whatsapp }}" target="_blank" class="text-gray-400 hover:text-cultura-green transition-colors text-sm">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+            {% endif %}
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if artistas.has_other_pages %}
+<div class="mt-24 flex justify-center">
+    <nav class="flex items-center gap-2 p-2 bg-white rounded-full shadow-premium border border-gray-100">
+        {% if artistas.has_previous %}
+        <a href="?page={{ artistas.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if follow_status %}&follow_status={{ follow_status }}{% endif %}"
+            class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        <div class="px-6 py-2 bg-cultura-sand-light rounded-full">
+            <span class="text-[10px] font-display font-black text-cultura-dark uppercase tracking-widest">
+                {{ artistas.number }} <span class="text-gray-400 mx-2">/</span> {{ artistas.paginator.num_pages }}
+            </span>
+        </div>
+
+        {% if artistas.has_next %}
+        <a href="?page={{ artistas.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if follow_status %}&follow_status={{ follow_status }}{% endif %}"
+            class="pagination-link w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:bg-cultura-sand-light hover:text-cultura-dark transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+
+{% else %}
+<div class="text-center py-32 glass rounded-[4rem] border-2 border-dashed border-gray-100" data-aos="fade-up">
+    <div class="w-24 h-24 bg-cultura-sand-light rounded-full flex items-center justify-center mx-auto mb-8">
+        <i class="fa-regular fa-star text-4xl text-gray-300"></i>
+    </div>
+    <h3 class="font-serif italic text-2xl text-cultura-dark mb-4">Silêncio Inspirador</h3>
+    <p class="text-gray-400 font-light max-w-sm mx-auto">Nenhum resultado encontrado para esta combinação de filtros. Tente novas descobertas!</p>
+</div>
+{% endif %}
